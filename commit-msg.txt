@@ -1,0 +1,10 @@
+feat: Phase 1 implementation
+
+- 日めくりカレンダーカード（フリップアニメーション）
+- 気分スタンプ5段階・罫線テキストエリア
+- 写真添付（Canvas max800px自動圧縮）
+- 積み上げトラッカー（読書/運動/勉強）
+- localStorage永続保存
+- ストリーク・EXP・レベル・バッジ ゲーミフィケーション
+- 月間カレンダー・タイムトラベルカード
+- PWA（manifest.json + service-worker.js）

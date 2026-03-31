@@ -1,0 +1,146 @@
+/* ================================================
+   animations.css — すべてのアニメーション定義
+   ================================================ */
+
+/* --- 日めくりフリップ --- */
+@keyframes flipIn {
+  0%   { transform: rotateX(-90deg); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: rotateX(0); }
+}
+
+.calendar-inner.flipping {
+  animation: flipIn 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* --- 炎のパルス --- */
+@keyframes flamePulse {
+  0%, 100% { transform: scale(1);    filter: brightness(1); }
+  50%       { transform: scale(1.15); filter: brightness(1.2); }
+}
+
+.streak-flame {
+  animation: flamePulse 1.5s ease-in-out infinite;
+}
+
+/* --- 気分リングエフェクト --- */
+@keyframes moodRing {
+  0%   { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+.mood-btn.selected::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  animation: moodRing 0.6s ease-out forwards;
+}
+
+/* --- 保存リップル --- */
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+.save-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(0);
+  animation: ripple 0.6s ease-out;
+  pointer-events: none;
+}
+
+/* --- スライドアップ (タイムトラベルカード) --- */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.past-card.show {
+  animation: slideUp 0.5s ease-out;
+}
+
+/* --- バッジポップ --- */
+@keyframes badgePop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.badge-content {
+  animation: badgePop 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* --- 紙吹雪 --- */
+@keyframes confettiFall {
+  0%   { transform: translateY(0) rotate(0deg);    opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  animation: confettiFall 1.5s ease-out forwards;
+}
+
+/* --- トースト スライドイン --- */
+.toast {
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* --- EXP バー --- */
+.xp-fill {
+  transition: width 0.8s ease;
+}
+
+/* --- カードホバー --- */
+.diary-card:hover,
+.past-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-float);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* --- ボタンホバー/アクティブ --- */
+.icon-btn {
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.icon-btn:hover   { transform: scale(1.08); box-shadow: var(--shadow-card); }
+.icon-btn:active  { transform: scale(0.95); }
+
+.action-btn:active { transform: scale(0.95); }
+
+.save-btn {
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+}
+.save-btn:hover  { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(224,122,58,0.4); }
+.save-btn:active { transform: translateY(0) scale(0.98); }
+
+/* --- 積み上げアイテム --- */
+.acc-item {
+  transition: background 0.15s, transform 0.15s;
+}
+.acc-item:hover  { background: var(--accent-light); transform: translateY(-1px); }
+.acc-item:active { transform: scale(0.97); }
+
+/* --- 気分ボタン --- */
+.mood-btn {
+  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.mood-btn:hover  { transform: scale(1.12); border-color: var(--text-hint); }
+.mood-btn:active { transform: scale(0.92); }
+
+/* --- nav-item --- */
+.nav-item {
+  transition: color 0.15s;
+}
+
+/* --- day-cell ホバー --- */
+.day-cell {
+  transition: background 0.15s, transform 0.1s;
+}
+.day-cell:hover { background: var(--bg-warm); }
