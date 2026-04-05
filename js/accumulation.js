@@ -79,6 +79,33 @@ const Accumulation = {
     const settings = Storage.getSettings();
     return [...DEFAULT_CATEGORIES, ...(settings.customCategories || [])];
   },
+
+  // ─── 目標管理 ───────────────────────────────────────────
+  getGoals() {
+    const s = Storage.getSettings();
+    return s.accGoals || {};
+  },
+
+  setGoal(key, value) {
+    const s = Storage.getSettings();
+    if (!s.accGoals) s.accGoals = {};
+    s.accGoals[key] = value;
+    Storage.setSettings(s);
+  },
+
+  /** 今月の合計を返す */
+  getMonthlyTotal(key) {
+    const now = new Date();
+    const acc = Storage.getAccumulation();
+    let total = 0;
+    for (const [dateStr, val] of Object.entries(acc)) {
+      const d = new Date(dateStr);
+      if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+        total += val[key] || 0;
+      }
+    }
+    return total;
+  },
 };
 
 export { Accumulation, DEFAULT_CATEGORIES };

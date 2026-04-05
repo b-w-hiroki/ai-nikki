@@ -81,6 +81,19 @@ function init() {
       Accumulation.editItem(item, item.dataset.key)
     );
   });
+
+  // 目標設定ボタン
+  document.getElementById('btnSetGoal')?.addEventListener('click', openGoalModal);
+
+  // 目標モーダルの保存/閉じる
+  document.getElementById('btnSaveGoals')?.addEventListener('click', saveGoals);
+  document.getElementById('btnCloseGoalModal')?.addEventListener('click', closeGoalModal);
+  document.getElementById('goalModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('goalModal')) closeGoalModal();
+  });
+
+  // 積み上げ進捗を初期描画
+  renderAccProgress();
 }
 
 // ─── 日めくりヘッダー ────────────────────────────────────
@@ -289,15 +302,62 @@ function changeMonth(delta) {
   renderCalendarGrid();
 }
 
+// スタンププール（ボーナス用）
+const BONUS_STAMPS = ['✨','⭐','🌟','💫','🌸','🍀','🌈','🎵','💎','🔮','🎀','🌺','🦋','🌻','💐'];
+const MOOD_STAMPS  = { great: '😄', good: '🙂', ok: '😐', bad: '😟', awful: '😢' };
+
+/**
+ * 日付文字列をシードにした擬似乱数（0〜1）
+ * 同じ日付なら常に同じ値を返す（再描画で変わらない）
+ */
+function seededRand(dateStr, salt = 0) {
+  let h = salt;
+  for (let i = 0; i < dateStr.length; i++) h = (Math.imul(31, h) + dateStr.charCodeAt(i)) | 0;
+  return ((h >>> 0) % 1000) / 1000;
+}
+
+function buildStampsHtml(dateStr, entry) {
+  const stamps = [];
+
+  // 気分スタンプ（必ず1枚目）
+  if (entry.mood && MOOD_STAMPS[entry.mood]) {
+    stamps.push(MOOD_STAMPS[entry.mood]);
+  }
+
+  // 写真があれば📸
+  if (Storage.getPhoto(dateStr)) stamps.push('📸');
+
+  // 積み上げ別スタンプ
+  const acc = entry.accumulation || {};
+  if ((acc.reading  || 0) > 0) stamps.push('📚');
+  if ((acc.exercise || 0) > 0) stamps.push('💪');
+  if ((acc.study    || 0) > 0) stamps.push('✏️');
+
+  // ボーナスを最大1枚追加（ランダム固定）
+  if (stamps.length < 3) {
+    const idx = Math.floor(seededRand(dateStr, 99) * BONUS_STAMPS.length);
+    stamps.push(BONUS_STAMPS[idx]);
+  }
+
+  // 最大3枚まで
+  const shown = stamps.slice(0, 3);
+
+  return shown.map((emoji, i) => {
+    const rot   = Math.round(seededRand(dateStr, i) * 30 - 15); // -15〜+14度
+    const scale = 0.85 + seededRand(dateStr, i + 10) * 0.3;    // 0.85〜1.15
+    return `<span class="cal-stamp" style="transform:rotate(${rot}deg) scale(${scale})">${emoji}</span>`;
+  }).join('');
+}
+
 function renderCalendarGrid() {
   document.getElementById('monthTitle').textContent = `${calYear}年 ${MONTHS_JP[calMonth]}`;
   const grid = document.getElementById('daysGrid');
   if (!grid) return;
   grid.innerHTML = '';
 
-  const moodMap = Diary.getMoodMap();
-  const today = Diary.todayStr();
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const entries = Storage.getEntries();
+  const today   = Diary.todayStr();
+  const firstDay    = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
 
   for (let i = 0; i < firstDay; i++) {
@@ -308,18 +368,26 @@ function renderCalendarGrid() {
 
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const c = document.createElement('div');
-    c.className = 'day-cell';
-    c.textContent = d;
+    const entry   = entries[dateStr];
+    const c       = document.createElement('div');
+    c.className   = 'day-cell';
 
     if (dateStr === today) c.classList.add('today');
 
-    const mood = moodMap[dateStr];
-    if (mood) c.classList.add('has-entry', `mood-${mood}`);
+    if (entry) {
+      c.classList.add('has-entry');
+      c.innerHTML = `
+        <span class="day-num">${d}</span>
+        <div class="stamp-container">${buildStampsHtml(dateStr, entry)}</div>
+      `;
+      c.addEventListener('click', () => openDayView(dateStr));
+    } else {
+      c.textContent = d;
+      if (dateStr === today) {
+        c.addEventListener('click', () => showScreen('home'));
+      }
+    }
 
-    c.addEventListener('click', () => {
-      if (mood || dateStr === today) openDayView(dateStr);
-    });
     grid.appendChild(c);
   }
 }
@@ -380,10 +448,78 @@ function renderMonthlyAccumulation() {
   set('accStudyTotal',     `${totals.study} 時間`);
 }
 
+// ─── 積み上げ目標モーダル ─────────────────────────────────
+function openGoalModal() {
+  const goals = Accumulation.getGoals();
+  const categories = [
+    { key: 'reading',  label: '読書',  unit: 'ページ/月' },
+    { key: 'exercise', label: '運動',  unit: '分/月' },
+    { key: 'study',    label: '勉強',  unit: '時間/月' },
+  ];
+
+  const rows = categories.map((cat) => `
+    <div class="goal-row">
+      <label class="goal-label">${cat.label}</label>
+      <div class="goal-input-wrap">
+        <input class="goal-input" type="number" min="0" data-key="${cat.key}"
+          value="${goals[cat.key] || ''}" placeholder="未設定">
+        <span class="goal-unit">${cat.unit}</span>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('goalModalBody').innerHTML = rows;
+  document.getElementById('goalModal').classList.add('show');
+}
+
+function saveGoals() {
+  document.querySelectorAll('#goalModalBody .goal-input').forEach((inp) => {
+    const key = inp.dataset.key;
+    const val = parseFloat(inp.value);
+    if (!isNaN(val) && val > 0) {
+      Accumulation.setGoal(key, val);
+    } else if (inp.value === '') {
+      Accumulation.setGoal(key, 0);
+    }
+  });
+  closeGoalModal();
+  renderAccProgress();
+  showToast('🎯 目標を設定しました！');
+}
+
+function closeGoalModal() {
+  document.getElementById('goalModal').classList.remove('show');
+}
+
+/** ホーム画面の積み上げセクションに今月進捗を反映 */
+function renderAccProgress() {
+  const goals    = Accumulation.getGoals();
+  const keys     = ['reading', 'exercise', 'study'];
+
+  keys.forEach((key) => {
+    const goal  = goals[key] || 0;
+    const total = Accumulation.getMonthlyTotal(key);
+    const bar   = document.querySelector(`.acc-progress-mini[data-key="${key}"]`);
+    const label = document.querySelector(`.acc-goal-label[data-key="${key}"]`);
+    if (!bar) return;
+
+    if (goal > 0) {
+      bar.style.width = `${Math.min((total / goal) * 100, 100)}%`;
+      bar.parentElement.style.display = 'block';
+      if (label) label.textContent = `${total} / ${goal}`;
+    } else {
+      bar.parentElement.style.display = 'none';
+    }
+  });
+}
+
 // ─── グローバル公開（インライン onclick 用） ─────────────
-window.showScreen = showScreen;
-window.showToast  = showToast;
-window.changeMonth = changeMonth;
+window.showScreen    = showScreen;
+window.showToast     = showToast;
+window.changeMonth   = changeMonth;
+window.openGoalModal = openGoalModal;
+window.saveGoals     = saveGoals;
+window.closeGoalModal = closeGoalModal;
 
 // ─── エントリポイント ────────────────────────────────────
 document.addEventListener('DOMContentLoaded', init);

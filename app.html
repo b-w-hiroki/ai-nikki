@@ -111,6 +111,7 @@
                 <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
               </svg>
               今日の積み上げ
+              <button class="goal-set-btn" id="btnSetGoal" title="月間目標を設定">🎯 目標</button>
             </div>
             <div class="acc-grid">
               <div class="acc-item" data-key="reading">
@@ -120,6 +121,12 @@
                   <div class="acc-val-wrap">
                     <span class="acc-value" data-key="reading">0</span>
                     <span class="acc-unit">ページ</span>
+                  </div>
+                  <div class="acc-mini-progress" style="display:none">
+                    <div class="acc-mini-track">
+                      <div class="acc-progress-mini" data-key="reading" style="width:0%;background:#5c9ce6"></div>
+                    </div>
+                    <span class="acc-goal-label" data-key="reading"></span>
                   </div>
                   <input class="acc-input" type="number" min="0" step="1" placeholder="0">
                 </div>
@@ -132,6 +139,12 @@
                     <span class="acc-value" data-key="exercise">0</span>
                     <span class="acc-unit">分</span>
                   </div>
+                  <div class="acc-mini-progress" style="display:none">
+                    <div class="acc-mini-track">
+                      <div class="acc-progress-mini" data-key="exercise" style="width:0%;background:#4CAF50"></div>
+                    </div>
+                    <span class="acc-goal-label" data-key="exercise"></span>
+                  </div>
                   <input class="acc-input" type="number" min="0" step="1" placeholder="0">
                 </div>
               </div>
@@ -142,6 +155,12 @@
                   <div class="acc-val-wrap">
                     <span class="acc-value" data-key="study">0</span>
                     <span class="acc-unit">時間</span>
+                  </div>
+                  <div class="acc-mini-progress" style="display:none">
+                    <div class="acc-mini-track">
+                      <div class="acc-progress-mini" data-key="study" style="width:0%;background:var(--xp-bar)"></div>
+                    </div>
+                    <span class="acc-goal-label" data-key="study"></span>
                   </div>
                   <input class="acc-input" type="number" min="0" step="0.5" placeholder="0">
                 </div>
@@ -314,6 +333,19 @@
     <div class="badge-title" id="badgeTitle"></div>
     <div class="badge-desc"  id="badgeDesc"></div>
     <button class="badge-close" onclick="closeBadge()">やったね！</button>
+  </div>
+</div>
+
+<!-- 目標設定モーダル -->
+<div class="badge-unlock" id="goalModal">
+  <div class="badge-content goal-modal-content" onclick="event.stopPropagation()">
+    <div class="badge-title" style="margin-bottom:4px">🎯 月間目標を設定</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px">今月の積み上げ目標を入力してください</div>
+    <div id="goalModalBody"></div>
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="badge-close" style="flex:1;background:var(--bg-warm);color:var(--text-secondary)" id="btnCloseGoalModal">キャンセル</button>
+      <button class="badge-close" style="flex:1" id="btnSaveGoals">保存する</button>
+    </div>
   </div>
 </div>
 

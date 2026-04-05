@@ -405,6 +405,83 @@ body {
 }
 .acc-input:focus { outline: none; border-color: var(--accent); }
 
+/* 目標設定ボタン */
+.goal-set-btn {
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1.5px solid var(--accent-light);
+  border-radius: 20px;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.goal-set-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ミニ進捗バー（各acc-item内） */
+.acc-mini-progress {
+  margin-top: 4px;
+}
+.acc-mini-track {
+  height: 4px;
+  background: var(--xp-bg);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 2px;
+}
+.acc-progress-mini {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+.acc-goal-label {
+  font-size: 10px;
+  color: var(--text-hint);
+}
+
+/* 目標モーダル内 */
+.goal-modal-content { max-width: 340px; width: 90%; text-align: left; }
+
+.goal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0ebe3;
+}
+.goal-row:last-child { border-bottom: none; }
+
+.goal-label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.goal-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.goal-input {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1.5px solid #ebe5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-align: center;
+  background: var(--bg-warm);
+  color: var(--text-primary);
+}
+.goal-input:focus { outline: none; border-color: var(--accent); }
+
+.goal-unit { font-size: 11px; color: var(--text-hint); }
+
 /* ─── 保存ボタン ─────────────────────────────────────── */
 .save-btn {
   width: 100%;
@@ -622,23 +699,44 @@ body {
   position: relative;
 }
 
-.day-cell.today     { font-weight: 700; color: var(--accent); }
-.day-cell.empty     { cursor: default; }
+.day-cell.today { font-weight: 700; color: var(--accent); }
+.day-cell.empty { cursor: default; }
 
-.day-cell.has-entry::after {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  position: absolute;
-  bottom: 4px;
+/* 記録あり日のセル */
+.day-cell.has-entry {
+  background: var(--bg-warm);
+  border-radius: var(--radius-sm);
+  padding: 2px 0 4px;
+  cursor: pointer;
 }
 
-.day-cell.mood-great::after  { background: var(--mood-great); }
-.day-cell.mood-good::after   { background: var(--mood-good); }
-.day-cell.mood-ok::after     { background: var(--mood-ok); }
-.day-cell.mood-bad::after    { background: var(--mood-bad); }
-.day-cell.mood-awful::after  { background: var(--mood-awful); }
+.day-num {
+  display: block;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* スタンプコンテナ */
+.stamp-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1px;
+  padding: 0 2px;
+  min-height: 18px;
+}
+
+.cal-stamp {
+  font-size: 12px;
+  display: inline-block;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+  transition: transform 0.15s;
+}
+
+.day-cell.has-entry:hover .cal-stamp {
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+}
 
 /* ─── プロフィール画面 ───────────────────────────────── */
 .profile-section { padding: 20px 0; }
