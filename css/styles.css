@@ -897,6 +897,125 @@ body {
 .badge-item-icon { font-size: 28px; }
 .badge-item-name { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
 
+/* ─── 感情コレクション図鑑 ───────────────────────────── */
+.mood-collection {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.mood-collect-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 2px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-warm);
+}
+.mood-collect-item.locked { opacity: 0.35; filter: grayscale(1); }
+.mood-collect-emoji { font-size: 26px; }
+.mood-collect-count { font-size: 10px; color: var(--text-secondary); font-weight: 700; }
+
+.combo-list { display: flex; flex-direction: column; gap: 8px; }
+.combo-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-warm);
+  border: 1px solid transparent;
+}
+.combo-item.unlocked { border-color: var(--accent-light); background: var(--accent-light); }
+.combo-item.locked { opacity: 0.45; }
+.combo-icon { font-size: 24px; }
+.combo-text { flex: 1; }
+.combo-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.combo-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
+.combo-lock { font-size: 14px; }
+
+/* ─── 気分バランスバー ───────────────────────────────── */
+.mood-balance { display: flex; flex-direction: column; gap: 8px; }
+.mb-row { display: flex; align-items: center; gap: 8px; }
+.mb-emoji { font-size: 18px; width: 24px; text-align: center; }
+.mb-track { flex: 1; height: 10px; background: var(--xp-bg); border-radius: 5px; overflow: hidden; }
+.mb-fill { height: 100%; border-radius: 5px; transition: width 0.6s ease; }
+.mb-count { font-size: 11px; color: var(--text-secondary); width: 28px; text-align: right; }
+
+/* ─── Year in Review ボタン ──────────────────────────── */
+.year-review-btn {
+  width: 100%;
+  margin-top: 4px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, #7c5cbf, #e06088);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+}
+.year-review-btn:active { transform: scale(0.98); }
+
+/* ─── Year in Review オーバーレイ ────────────────────── */
+.yr-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  background: #14122a;
+  overflow: hidden;
+}
+.yr-overlay.show { display: block; }
+.yr-slides { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.23,1,0.32,1); }
+.yr-slide {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 28px;
+  text-align: center;
+  color: #fff;
+}
+.yr-slide h2 { font-family: var(--font-display); font-size: 22px; margin-bottom: 24px; opacity: 0.9; }
+.yr-big { font-family: var(--font-display); font-size: 56px; font-weight: 700; line-height: 1.1; }
+.yr-sub { font-size: 14px; opacity: 0.8; margin-top: 6px; }
+.yr-stat-row { display: flex; gap: 24px; margin-top: 20px; }
+.yr-stat-num { font-family: var(--font-display); font-size: 34px; font-weight: 700; }
+.yr-stat-lbl { font-size: 11px; opacity: 0.75; }
+.yr-mood-line { font-size: 18px; margin: 6px 0; }
+.yr-emoji-hero { font-size: 72px; margin-bottom: 12px; }
+.yr-gradient-1 { background: linear-gradient(160deg, #7c5cbf, #4a3b8f); }
+.yr-gradient-2 { background: linear-gradient(160deg, #e06088, #b8456a); }
+.yr-gradient-3 { background: linear-gradient(160deg, #3d9650, #2c7a3c); }
+.yr-gradient-4 { background: linear-gradient(160deg, #e07a3a, #b85a1f); }
+.yr-gradient-5 { background: linear-gradient(160deg, #ff6d00, #7c5cbf); }
+.yr-close {
+  position: absolute; top: 16px; right: 16px; z-index: 210;
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.2); color: #fff; font-size: 18px; cursor: pointer;
+}
+.yr-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 210;
+  width: 44px; height: 44px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.15); color: #fff; font-size: 24px; cursor: pointer;
+}
+.yr-prev { left: 8px; }
+.yr-next { right: 8px; }
+.yr-nav:disabled { opacity: 0; pointer-events: none; }
+.yr-dots {
+  position: absolute; bottom: 24px; left: 0; right: 0; z-index: 210;
+  display: flex; justify-content: center; gap: 8px;
+}
+.yr-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.35); }
+.yr-dot.active { background: #fff; width: 22px; border-radius: 4px; }
+
 /* ─── レスポンシブ ───────────────────────────────────── */
 @media (max-width: 380px) {
   .mood-btn  { width: 42px; height: 42px; font-size: 20px; }

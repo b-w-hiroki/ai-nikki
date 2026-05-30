@@ -294,11 +294,31 @@
         </div>
       </div>
 
+      <!-- 感情コレクション図鑑 -->
+      <div class="profile-card">
+        <div class="profile-card-title">感情コレクション</div>
+        <div class="mood-collection" id="moodCollection"></div>
+        <div class="combo-list" id="comboList"></div>
+      </div>
+
+      <!-- 気分のバランス -->
+      <div class="profile-card">
+        <div class="profile-card-title">気分のバランス</div>
+        <div class="mood-balance" id="moodBalance"></div>
+      </div>
+
       <!-- 実績バッジ -->
       <div class="profile-card">
         <div class="profile-card-title">実績バッジ</div>
         <div class="badge-list" id="badgeList"></div>
       </div>
+
+      <!-- Year in Review -->
+      <button class="year-review-btn" id="btnYearReview">
+        <span style="font-size:20px">🎁</span>
+        <span><strong id="yearReviewLabel">今年をふりかえる</strong><br>
+        <span style="font-size:11px;opacity:0.85">Year in Review</span></span>
+      </button>
     </div>
   </div><!-- /screen-profile -->
 
@@ -380,6 +400,15 @@
       <button class="badge-close" style="width:100%;background:var(--bg-warm);color:var(--text-secondary)" id="btnCloseSettings">閉じる</button>
     </div>
   </div>
+</div>
+
+<!-- Year in Review（スライド） -->
+<div class="yr-overlay" id="yrOverlay">
+  <button class="yr-close" id="btnCloseYr">✕</button>
+  <div class="yr-slides" id="yrSlides"></div>
+  <div class="yr-dots" id="yrDots"></div>
+  <button class="yr-nav yr-prev" id="yrPrev">‹</button>
+  <button class="yr-nav yr-next" id="yrNext">›</button>
 </div>
 
 <script type="module" src="js/app.js"></script>
