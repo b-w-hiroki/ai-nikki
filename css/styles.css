@@ -482,6 +482,37 @@ body {
 
 .goal-unit { font-size: 11px; color: var(--text-hint); }
 
+/* ─── 設定モーダル ─────────────────────────── */
+.settings-modal-content { max-width: 360px; width: 90%; text-align: left; }
+.settings-section {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--accent-light);
+}
+.settings-section:last-of-type { border-bottom: none; padding-bottom: 0; }
+.settings-label { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.settings-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px; }
+.settings-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: transform 0.15s, background 0.15s;
+}
+.settings-btn:active { transform: scale(0.97); }
+.settings-btn-sub {
+  background: var(--bg-warm);
+  color: var(--accent-dark);
+  border: 1.5px solid var(--accent-light);
+}
+.settings-usage { font-size: 11px; color: var(--text-hint); text-align: center; margin-top: 4px; }
+
 /* ─── 保存ボタン ─────────────────────────────────────── */
 .save-btn {
   width: 100%;
