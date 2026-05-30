@@ -13,6 +13,14 @@ import { DataIO } from './dataio.js';
 const DAYS_JP  = ['日', '月', '火', '水', '木', '金', '土'];
 const MONTHS_JP = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 
+const THEMES = [
+  { key: 'paper',    name: 'ペーパー',   color: '#f7f3ee' },
+  { key: 'midnight', name: 'ミッドナイト', color: '#1a1a2e' },
+  { key: 'retro',    name: 'レトロ',     color: '#f0e6d3' },
+  { key: 'forest',   name: 'フォレスト',  color: '#e8f5e9' },
+  { key: 'sakura',   name: 'さくら',     color: '#fce4ec' },
+];
+
 // ─── 状態 ───────────────────────────────────────────────
 let currentScreen = 'home';
 let calMonth, calYear;
@@ -22,6 +30,8 @@ function init() {
   const now = new Date();
   calMonth = now.getMonth();
   calYear  = now.getFullYear();
+
+  applyTheme(Storage.getSettings().theme || 'paper');
 
   renderCalendarHeader(now);
   flipCalendarAnimation();
@@ -133,11 +143,57 @@ function init() {
 function openSettings() {
   const usage = document.getElementById('settingsUsage');
   if (usage) usage.textContent = `使用容量: 約 ${Storage.getStorageUsageKB()} KB`;
+  renderThemeGrid();
   document.getElementById('settingsModal')?.classList.add('show');
 }
 
 function closeSettings() {
   document.getElementById('settingsModal')?.classList.remove('show');
+}
+
+// ─── テーマ ──────────────────────────────────────────────
+function applyTheme(theme) {
+  const t = THEMES.some((x) => x.key === theme) ? theme : 'paper';
+  if (t === 'paper') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', t);
+  }
+  // ブラウザのテーマカラー（アドレスバー等）も合わせる
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const def = THEMES.find((x) => x.key === t);
+  if (meta && def) meta.setAttribute('content', def.color);
+}
+
+function renderThemeGrid() {
+  const grid = document.getElementById('themeGrid');
+  if (!grid) return;
+  const current = Storage.getSettings().theme || 'paper';
+
+  grid.innerHTML = THEMES.map((t) => `
+    <button class="theme-swatch${t.key === current ? ' active' : ''}" data-theme-key="${t.key}">
+      <span class="theme-dot" style="background:${t.color}"></span>
+      <span class="theme-name">${t.name}</span>
+    </button>
+  `).join('');
+
+  grid.querySelectorAll('.theme-swatch').forEach((btn) => {
+    btn.addEventListener('click', () => selectTheme(btn.dataset.themeKey));
+  });
+}
+
+function selectTheme(theme) {
+  const settings = Storage.getSettings();
+  settings.theme = theme;
+  Storage.setSettings(settings);
+  applyTheme(theme);
+
+  document.querySelectorAll('#themeGrid .theme-swatch').forEach((b) => {
+    b.classList.toggle('active', b.dataset.themeKey === theme);
+  });
+
+  const def = THEMES.find((x) => x.key === theme);
+  showToast(`🎨 テーマを「${def ? def.name : theme}」に変更しました`);
 }
 
 // ─── 日めくりヘッダー ────────────────────────────────────
