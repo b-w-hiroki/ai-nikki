@@ -7,6 +7,7 @@ import { Mood } from './mood.js';
 import { Photo } from './photo.js';
 import { Accumulation } from './accumulation.js';
 import { Gamification } from './gamification.js';
+import { DataIO } from './dataio.js';
 
 // ─── 定数 ───────────────────────────────────────────────
 const DAYS_JP  = ['日', '月', '火', '水', '木', '金', '土'];
@@ -94,6 +95,49 @@ function init() {
 
   // 積み上げ進捗を初期描画
   renderAccProgress();
+
+  // 設定モーダル
+  document.getElementById('btnOpenSettings')?.addEventListener('click', openSettings);
+  document.getElementById('btnCloseSettings')?.addEventListener('click', closeSettings);
+  document.getElementById('settingsModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('settingsModal')) closeSettings();
+  });
+
+  // エクスポート
+  document.getElementById('btnExportData')?.addEventListener('click', () => {
+    DataIO.exportToFile();
+    showToast('⬇️ バックアップを保存しました！');
+  });
+
+  // インポート
+  document.getElementById('btnImportData')?.addEventListener('click', () =>
+    document.getElementById('importInput')?.click()
+  );
+  document.getElementById('importInput')?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = ''; // 同じファイルを再選択できるようにリセット
+    if (!file) return;
+    if (!confirm('現在のデータを上書きして復元しますか？\nこの操作は元に戻せません。')) return;
+
+    const result = await DataIO.importFromFile(file);
+    if (result.ok) {
+      showToast('✅ ' + result.message);
+      setTimeout(() => location.reload(), 1200);
+    } else {
+      showToast('⚠️ ' + result.message);
+    }
+  });
+}
+
+// ─── 設定モーダル ────────────────────────────────────────
+function openSettings() {
+  const usage = document.getElementById('settingsUsage');
+  if (usage) usage.textContent = `使用容量: 約 ${Storage.getStorageUsageKB()} KB`;
+  document.getElementById('settingsModal')?.classList.add('show');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal')?.classList.remove('show');
 }
 
 // ─── 日めくりヘッダー ────────────────────────────────────

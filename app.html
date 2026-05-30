@@ -242,7 +242,7 @@
       <button class="icon-btn" onclick="showScreen('home')" style="font-size:18px">←</button>
       <h1>マイページ</h1>
       <div class="header-icons">
-        <button class="icon-btn" style="font-size:14px">⚙</button>
+        <button class="icon-btn" id="btnOpenSettings" style="font-size:14px" title="設定">⚙</button>
       </div>
     </header>
     <div class="profile-section">
@@ -345,6 +345,33 @@
     <div style="display:flex;gap:8px;margin-top:20px">
       <button class="badge-close" style="flex:1;background:var(--bg-warm);color:var(--text-secondary)" id="btnCloseGoalModal">キャンセル</button>
       <button class="badge-close" style="flex:1" id="btnSaveGoals">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- 設定モーダル -->
+<div class="badge-unlock" id="settingsModal">
+  <div class="badge-content settings-modal-content" onclick="event.stopPropagation()">
+    <div class="badge-title" style="margin-bottom:4px">⚙ 設定</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:18px">データのバックアップと復元ができます</div>
+
+    <div class="settings-section">
+      <div class="settings-label">データのバックアップ</div>
+      <div class="settings-desc">すべての日記・写真・記録を 1 つの JSON ファイルに保存します。</div>
+      <button class="settings-btn" id="btnExportData">⬇️ エクスポート（ファイルに保存）</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-label">データの復元</div>
+      <div class="settings-desc">バックアップファイルから復元します。<strong>現在のデータは上書き</strong>されます。</div>
+      <button class="settings-btn settings-btn-sub" id="btnImportData">⬆️ インポート（ファイルから復元）</button>
+      <input type="file" id="importInput" accept="application/json,.json" style="display:none">
+    </div>
+
+    <div class="settings-usage" id="settingsUsage"></div>
+
+    <div style="margin-top:20px">
+      <button class="badge-close" style="width:100%;background:var(--bg-warm);color:var(--text-secondary)" id="btnCloseSettings">閉じる</button>
     </div>
   </div>
 </div>
