@@ -242,7 +242,7 @@
       <button class="icon-btn" onclick="showScreen('home')" style="font-size:18px">←</button>
       <h1>マイページ</h1>
       <div class="header-icons">
-        <button class="icon-btn" style="font-size:14px">⚙</button>
+        <button class="icon-btn" id="btnOpenSettings" style="font-size:14px" title="設定">⚙</button>
       </div>
     </header>
     <div class="profile-section">
@@ -294,11 +294,31 @@
         </div>
       </div>
 
+      <!-- 感情コレクション図鑑 -->
+      <div class="profile-card">
+        <div class="profile-card-title">感情コレクション</div>
+        <div class="mood-collection" id="moodCollection"></div>
+        <div class="combo-list" id="comboList"></div>
+      </div>
+
+      <!-- 気分のバランス -->
+      <div class="profile-card">
+        <div class="profile-card-title">気分のバランス</div>
+        <div class="mood-balance" id="moodBalance"></div>
+      </div>
+
       <!-- 実績バッジ -->
       <div class="profile-card">
         <div class="profile-card-title">実績バッジ</div>
         <div class="badge-list" id="badgeList"></div>
       </div>
+
+      <!-- Year in Review -->
+      <button class="year-review-btn" id="btnYearReview">
+        <span style="font-size:20px">🎁</span>
+        <span><strong id="yearReviewLabel">今年をふりかえる</strong><br>
+        <span style="font-size:11px;opacity:0.85">Year in Review</span></span>
+      </button>
     </div>
   </div><!-- /screen-profile -->
 
@@ -347,6 +367,48 @@
       <button class="badge-close" style="flex:1" id="btnSaveGoals">保存する</button>
     </div>
   </div>
+</div>
+
+<!-- 設定モーダル -->
+<div class="badge-unlock" id="settingsModal">
+  <div class="badge-content settings-modal-content" onclick="event.stopPropagation()">
+    <div class="badge-title" style="margin-bottom:4px">⚙ 設定</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:18px">データのバックアップと復元ができます</div>
+
+    <div class="settings-section">
+      <div class="settings-label">テーマ</div>
+      <div class="settings-desc">アプリの配色を切り替えます。</div>
+      <div class="theme-grid" id="themeGrid"></div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-label">データのバックアップ</div>
+      <div class="settings-desc">すべての日記・写真・記録を 1 つの JSON ファイルに保存します。</div>
+      <button class="settings-btn" id="btnExportData">⬇️ エクスポート（ファイルに保存）</button>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-label">データの復元</div>
+      <div class="settings-desc">バックアップファイルから復元します。<strong>現在のデータは上書き</strong>されます。</div>
+      <button class="settings-btn settings-btn-sub" id="btnImportData">⬆️ インポート（ファイルから復元）</button>
+      <input type="file" id="importInput" accept="application/json,.json" style="display:none">
+    </div>
+
+    <div class="settings-usage" id="settingsUsage"></div>
+
+    <div style="margin-top:20px">
+      <button class="badge-close" style="width:100%;background:var(--bg-warm);color:var(--text-secondary)" id="btnCloseSettings">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Year in Review（スライド） -->
+<div class="yr-overlay" id="yrOverlay">
+  <button class="yr-close" id="btnCloseYr">✕</button>
+  <div class="yr-slides" id="yrSlides"></div>
+  <div class="yr-dots" id="yrDots"></div>
+  <button class="yr-nav yr-prev" id="yrPrev">‹</button>
+  <button class="yr-nav yr-next" id="yrNext">›</button>
 </div>
 
 <script type="module" src="js/app.js"></script>

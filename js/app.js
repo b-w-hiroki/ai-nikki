@@ -7,10 +7,20 @@ import { Mood } from './mood.js';
 import { Photo } from './photo.js';
 import { Accumulation } from './accumulation.js';
 import { Gamification } from './gamification.js';
+import { DataIO } from './dataio.js';
+import { Insights } from './insights.js';
 
 // ─── 定数 ───────────────────────────────────────────────
 const DAYS_JP  = ['日', '月', '火', '水', '木', '金', '土'];
 const MONTHS_JP = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+const THEMES = [
+  { key: 'paper',    name: 'ペーパー',   color: '#f7f3ee' },
+  { key: 'midnight', name: 'ミッドナイト', color: '#1a1a2e' },
+  { key: 'retro',    name: 'レトロ',     color: '#f0e6d3' },
+  { key: 'forest',   name: 'フォレスト',  color: '#e8f5e9' },
+  { key: 'sakura',   name: 'さくら',     color: '#fce4ec' },
+];
 
 // ─── 状態 ───────────────────────────────────────────────
 let currentScreen = 'home';
@@ -21,6 +31,8 @@ function init() {
   const now = new Date();
   calMonth = now.getMonth();
   calYear  = now.getFullYear();
+
+  applyTheme(Storage.getSettings().theme || 'paper');
 
   renderCalendarHeader(now);
   flipCalendarAnimation();
@@ -94,6 +106,101 @@ function init() {
 
   // 積み上げ進捗を初期描画
   renderAccProgress();
+
+  // Year in Review
+  document.getElementById('btnYearReview')?.addEventListener('click', openYearReview);
+  document.getElementById('btnCloseYr')?.addEventListener('click', closeYearReview);
+  document.getElementById('yrPrev')?.addEventListener('click', () => moveYrSlide(-1));
+  document.getElementById('yrNext')?.addEventListener('click', () => moveYrSlide(1));
+
+  // 設定モーダル
+  document.getElementById('btnOpenSettings')?.addEventListener('click', openSettings);
+  document.getElementById('btnCloseSettings')?.addEventListener('click', closeSettings);
+  document.getElementById('settingsModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('settingsModal')) closeSettings();
+  });
+
+  // エクスポート
+  document.getElementById('btnExportData')?.addEventListener('click', () => {
+    DataIO.exportToFile();
+    showToast('⬇️ バックアップを保存しました！');
+  });
+
+  // インポート
+  document.getElementById('btnImportData')?.addEventListener('click', () =>
+    document.getElementById('importInput')?.click()
+  );
+  document.getElementById('importInput')?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = ''; // 同じファイルを再選択できるようにリセット
+    if (!file) return;
+    if (!confirm('現在のデータを上書きして復元しますか？\nこの操作は元に戻せません。')) return;
+
+    const result = await DataIO.importFromFile(file);
+    if (result.ok) {
+      showToast('✅ ' + result.message);
+      setTimeout(() => location.reload(), 1200);
+    } else {
+      showToast('⚠️ ' + result.message);
+    }
+  });
+}
+
+// ─── 設定モーダル ────────────────────────────────────────
+function openSettings() {
+  const usage = document.getElementById('settingsUsage');
+  if (usage) usage.textContent = `使用容量: 約 ${Storage.getStorageUsageKB()} KB`;
+  renderThemeGrid();
+  document.getElementById('settingsModal')?.classList.add('show');
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal')?.classList.remove('show');
+}
+
+// ─── テーマ ──────────────────────────────────────────────
+function applyTheme(theme) {
+  const t = THEMES.some((x) => x.key === theme) ? theme : 'paper';
+  if (t === 'paper') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', t);
+  }
+  // ブラウザのテーマカラー（アドレスバー等）も合わせる
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const def = THEMES.find((x) => x.key === t);
+  if (meta && def) meta.setAttribute('content', def.color);
+}
+
+function renderThemeGrid() {
+  const grid = document.getElementById('themeGrid');
+  if (!grid) return;
+  const current = Storage.getSettings().theme || 'paper';
+
+  grid.innerHTML = THEMES.map((t) => `
+    <button class="theme-swatch${t.key === current ? ' active' : ''}" data-theme-key="${t.key}">
+      <span class="theme-dot" style="background:${t.color}"></span>
+      <span class="theme-name">${t.name}</span>
+    </button>
+  `).join('');
+
+  grid.querySelectorAll('.theme-swatch').forEach((btn) => {
+    btn.addEventListener('click', () => selectTheme(btn.dataset.themeKey));
+  });
+}
+
+function selectTheme(theme) {
+  const settings = Storage.getSettings();
+  settings.theme = theme;
+  Storage.setSettings(settings);
+  applyTheme(theme);
+
+  document.querySelectorAll('#themeGrid .theme-swatch').forEach((b) => {
+    b.classList.toggle('active', b.dataset.themeKey === theme);
+  });
+
+  const def = THEMES.find((x) => x.key === theme);
+  showToast(`🎨 テーマを「${def ? def.name : theme}」に変更しました`);
 }
 
 // ─── 日めくりヘッダー ────────────────────────────────────
@@ -426,6 +533,56 @@ function renderProfile() {
 
   // 今月の積み上げ
   renderMonthlyAccumulation();
+
+  // 感情コレクション + 気分バランス
+  renderMoodCollection();
+  renderMoodBalance();
+}
+
+// ─── 感情コレクション図鑑 ────────────────────────────────
+function renderMoodCollection() {
+  const grid = document.getElementById('moodCollection');
+  if (grid) {
+    grid.innerHTML = Insights.getMoodCollection().map((m) => `
+      <div class="mood-collect-item${m.unlocked ? '' : ' locked'}" title="${m.label}">
+        <span class="mood-collect-emoji">${m.unlocked ? m.emoji : '❔'}</span>
+        <span class="mood-collect-count">${m.unlocked ? '×' + m.count : '—'}</span>
+      </div>
+    `).join('');
+  }
+
+  const comboList = document.getElementById('comboList');
+  if (comboList) {
+    comboList.innerHTML = Insights.getComboCollection().map((c) => `
+      <div class="combo-item ${c.unlocked ? 'unlocked' : 'locked'}">
+        <span class="combo-icon">${c.unlocked ? c.icon : '🔒'}</span>
+        <div class="combo-text">
+          <div class="combo-name">${c.unlocked ? c.name : '？？？'}</div>
+          <div class="combo-desc">${c.desc}</div>
+        </div>
+        <span class="combo-lock">${c.unlocked ? '✅' : ''}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// ─── 気分バランスバー ────────────────────────────────────
+function renderMoodBalance() {
+  const el = document.getElementById('moodBalance');
+  if (!el) return;
+  const counts = Insights.getMoodCounts();
+  const max = Math.max(1, ...Object.values(counts));
+
+  el.innerHTML = Insights.MOOD_ORDER.map((id) => {
+    const meta = Insights.MOOD_META[id];
+    const c = counts[id];
+    const pct = (c / max) * 100;
+    return `<div class="mb-row">
+      <span class="mb-emoji">${meta.emoji}</span>
+      <div class="mb-track"><div class="mb-fill" style="width:${pct}%;background:${meta.color}"></div></div>
+      <span class="mb-count">${c}</span>
+    </div>`;
+  }).join('');
 }
 
 function renderMonthlyAccumulation() {
@@ -446,6 +603,116 @@ function renderMonthlyAccumulation() {
   set('accReadingTotal',   `${totals.reading} ページ`);
   set('accExerciseTotal',  `${totals.exercise} 分`);
   set('accStudyTotal',     `${totals.study} 時間`);
+}
+
+// ─── Year in Review ──────────────────────────────────────
+let _yrIndex = 0;
+let _yrTotal = 0;
+
+function openYearReview() {
+  const year = new Date().getFullYear();
+  const r = Insights.getYearReview(year);
+
+  if (r.totalEntries === 0) {
+    showToast(`📭 ${year}年の記録がまだありません`);
+    return;
+  }
+
+  const moodPeak = Object.entries(r.moodCounts).sort((a, b) => b[1] - a[1])[0];
+  const peakMeta = Insights.MOOD_META[moodPeak[0]];
+  const monthName = (i) => (i === null ? '—' : `${i + 1}月`);
+  const acc = r.accumulation;
+
+  const slides = [
+    {
+      cls: 'yr-gradient-1',
+      html: `<h2>${r.year}年のあなた</h2>
+        <div class="yr-emoji-hero">📖</div>
+        <div class="yr-big">${r.totalEntries}<span style="font-size:24px">日</span></div>
+        <div class="yr-sub">日記を書きました</div>
+        <div class="yr-stat-row">
+          <div><div class="yr-stat-num">${r.totalWords.toLocaleString()}</div><div class="yr-stat-lbl">文字</div></div>
+          <div><div class="yr-stat-num">${r.photoCount}</div><div class="yr-stat-lbl">写真</div></div>
+          <div><div class="yr-stat-num">${r.longestStreak}</div><div class="yr-stat-lbl">最長連続</div></div>
+        </div>`,
+    },
+    {
+      cls: 'yr-gradient-2',
+      html: `<h2>いちばんの気分</h2>
+        <div class="yr-emoji-hero">${peakMeta.emoji}</div>
+        <div class="yr-big" style="font-size:32px">${peakMeta.label}</div>
+        <div class="yr-sub">を ${moodPeak[1]} 回記録しました</div>
+        <div style="margin-top:24px">
+          ${Insights.MOOD_ORDER.map((id) => {
+            const m = Insights.MOOD_META[id];
+            return `<div class="yr-mood-line">${m.emoji} ${'■'.repeat(Math.min(20, r.moodCounts[id]))} ${r.moodCounts[id]}</div>`;
+          }).join('')}
+        </div>`,
+    },
+    {
+      cls: 'yr-gradient-3',
+      html: `<h2>感情の旅路</h2>
+        <div class="yr-emoji-hero">🗓️</div>
+        <div class="yr-sub" style="font-size:16px">いちばん活発だったのは</div>
+        <div class="yr-big" style="font-size:40px">${monthName(r.topMonth)}</div>
+        <div class="yr-sub">（${r.monthCounts[r.topMonth]} 件の記録）</div>
+        <div class="yr-sub" style="margin-top:20px">いちばんポジティブだったのは <strong>${monthName(r.bestMonth)}</strong></div>`,
+    },
+    {
+      cls: 'yr-gradient-4',
+      html: `<h2>積み上げの1年</h2>
+        <div class="yr-emoji-hero">🏔️</div>
+        <div class="yr-stat-row" style="flex-direction:column;gap:12px">
+          <div><div class="yr-stat-num">📚 ${acc.reading.toLocaleString()}</div><div class="yr-stat-lbl">読書ページ</div></div>
+          <div><div class="yr-stat-num">💪 ${acc.exercise.toLocaleString()}</div><div class="yr-stat-lbl">運動の分数</div></div>
+          <div><div class="yr-stat-num">✏️ ${acc.study.toLocaleString()}</div><div class="yr-stat-lbl">勉強の時間</div></div>
+        </div>`,
+    },
+    {
+      cls: 'yr-gradient-5',
+      html: `<h2>来年へ</h2>
+        <div class="yr-emoji-hero">🎉</div>
+        <div class="yr-big" style="font-size:28px">おつかれさま！</div>
+        <div class="yr-sub" style="margin-top:12px;line-height:1.8">
+          ${r.year}年も よく書きました。<br>
+          来年も あなたの毎日を<br>めくっていきましょう。
+        </div>`,
+    },
+  ];
+
+  _yrTotal = slides.length;
+  _yrIndex = 0;
+
+  document.getElementById('yrSlides').innerHTML = slides
+    .map((s) => `<div class="yr-slide ${s.cls}">${s.html}</div>`).join('');
+  document.getElementById('yrDots').innerHTML = slides
+    .map((_, i) => `<span class="yr-dot${i === 0 ? ' active' : ''}"></span>`).join('');
+
+  updateYrSlide();
+  document.getElementById('yrOverlay').classList.add('show');
+}
+
+function moveYrSlide(delta) {
+  _yrIndex = Math.max(0, Math.min(_yrTotal - 1, _yrIndex + delta));
+  updateYrSlide();
+}
+
+function updateYrSlide() {
+  const slides = document.getElementById('yrSlides');
+  if (slides) slides.style.transform = `translateX(-${_yrIndex * 100}%)`;
+
+  document.querySelectorAll('#yrDots .yr-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === _yrIndex);
+  });
+
+  const prev = document.getElementById('yrPrev');
+  const next = document.getElementById('yrNext');
+  if (prev) prev.disabled = _yrIndex === 0;
+  if (next) next.disabled = _yrIndex === _yrTotal - 1;
+}
+
+function closeYearReview() {
+  document.getElementById('yrOverlay').classList.remove('show');
 }
 
 // ─── 積み上げ目標モーダル ─────────────────────────────────
