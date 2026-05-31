@@ -39,6 +39,8 @@ function init() {
   loadTodayEntry();
   renderStreakBar();
   renderTimeTravelCard();
+  maybeShowOnboarding();
+  updateFirstHint();
 
   // 気分変更コールバック
   Mood.init(() => {});
@@ -61,7 +63,7 @@ function init() {
 
   // 気分ボタン
   document.querySelectorAll('.mood-btn').forEach((btn) => {
-    btn.addEventListener('click', () => Mood.select(btn.dataset.mood));
+    btn.addEventListener('click', () => { Mood.select(btn.dataset.mood); updateFirstHint(); });
   });
 
   // 写真ボタン
@@ -106,6 +108,10 @@ function init() {
 
   // 積み上げ進捗を初期描画
   renderAccProgress();
+
+  // オンボーディング
+  document.getElementById('onboardNext')?.addEventListener('click', onboardNext);
+  document.getElementById('onboardSkip')?.addEventListener('click', closeOnboarding);
 
   // Year in Review
   document.getElementById('btnYearReview')?.addEventListener('click', openYearReview);
@@ -371,6 +377,54 @@ function showToast(msg, duration = 2500) {
   toast.innerHTML = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// ─── 初回オンボーディング ────────────────────────────────
+let _onboardStep = 0;
+const ONBOARD_STEPS = 4;
+const ONBOARD_KEY = 'ai-nikki-onboarded';
+
+function maybeShowOnboarding() {
+  if (localStorage.getItem(ONBOARD_KEY)) return;
+  _onboardStep = 0;
+  renderOnboardStep();
+  document.getElementById('onboardOverlay')?.classList.add('show');
+}
+
+function renderOnboardStep() {
+  document.querySelectorAll('.onboard-slide').forEach((s) => {
+    s.hidden = parseInt(s.dataset.step) !== _onboardStep;
+  });
+  const dots = document.getElementById('onboardDots');
+  if (dots) {
+    dots.innerHTML = Array.from({ length: ONBOARD_STEPS }, (_, i) =>
+      `<span class="onboard-dot${i === _onboardStep ? ' active' : ''}"></span>`).join('');
+  }
+  const next = document.getElementById('onboardNext');
+  if (next) next.textContent = _onboardStep === ONBOARD_STEPS - 1 ? 'はじめる' : 'つぎへ';
+}
+
+function onboardNext() {
+  if (_onboardStep < ONBOARD_STEPS - 1) {
+    _onboardStep += 1;
+    renderOnboardStep();
+  } else {
+    closeOnboarding();
+  }
+}
+
+function closeOnboarding() {
+  localStorage.setItem(ONBOARD_KEY, '1');
+  document.getElementById('onboardOverlay')?.classList.remove('show');
+}
+
+// ─── 初回ヒント（まだ気分未選択なら👆を出す） ────────────
+function updateFirstHint() {
+  const hint = document.getElementById('moodHint');
+  if (!hint) return;
+  const hasAnyEntry = Object.keys(Storage.getEntries()).length > 0;
+  const moodChosen = !!Mood.getSelected();
+  hint.classList.toggle('show', !hasAnyEntry && !moodChosen);
 }
 
 // ─── バッジモーダル ──────────────────────────────────────
