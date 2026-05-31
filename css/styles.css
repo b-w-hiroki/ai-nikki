@@ -1111,8 +1111,148 @@ body {
 }
 .onboard-next:active { transform: scale(0.97); }
 
+/* ─── 今日のお題 ─────────────────────────────────────── */
+.daily-prompt {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 12px;
+  padding: 9px 12px;
+  background: var(--accent-light);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.12s;
+}
+.daily-prompt:active { transform: scale(0.98); }
+.daily-prompt-tag {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+.daily-prompt-text { font-size: 12px; color: var(--accent-dark); line-height: 1.4; }
+
+/* ─── 書き忘れリマインド ──────────────────────────────── */
+.reminder-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #fff4e6, #ffe9cc);
+  border: 1px solid var(--accent-light);
+  border-radius: var(--radius-sm);
+}
+.reminder-icon { font-size: 18px; }
+.reminder-text { font-size: 12px; color: var(--accent-dark); font-weight: 500; line-height: 1.4; }
+
+/* ─── 日記の全文検索 ─────────────────────────────────── */
+.search-panel { margin-bottom: 14px; }
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+}
+.search-ico { width: 16px; height: 16px; color: var(--text-hint); flex-shrink: 0; }
+.search-input {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  outline: none;
+}
+.search-results { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.search-result {
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+}
+.search-result-head { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.search-result-date { font-size: 11px; color: var(--text-secondary); font-weight: 700; }
+.search-result-text { font-size: 12px; color: var(--text-primary); line-height: 1.5; }
+.search-result-text mark { background: var(--accent-light); color: var(--accent-dark); border-radius: 3px; padding: 0 2px; }
+.search-empty { text-align: center; font-size: 12px; color: var(--text-hint); padding: 16px; }
+
+/* ─── 今週のふりかえり ──────────────────────────────── */
+.week-strip { display: flex; justify-content: space-between; gap: 4px; margin-bottom: 12px; }
+.week-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.week-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  background: var(--bg-warm);
+}
+.week-dot.empty { background: var(--bg-warm); color: var(--text-hint); }
+.week-dot.today { box-shadow: 0 0 0 2px var(--accent); }
+.week-dow { font-size: 9px; color: var(--text-secondary); }
+.week-summary { font-size: 12px; color: var(--text-secondary); line-height: 1.6; text-align: center; }
+.week-summary strong { color: var(--accent-dark); }
+
+/* ─── カスタムカテゴリ設定 ───────────────────────────── */
+.custom-cat-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.custom-cat-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-warm);
+  border-radius: var(--radius-sm);
+}
+.custom-cat-row .ccr-icon { font-size: 16px; }
+.custom-cat-row .ccr-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.custom-cat-row .ccr-unit { font-size: 11px; color: var(--text-secondary); }
+.custom-cat-row .ccr-del { background: none; border: none; color: var(--text-hint); cursor: pointer; font-size: 16px; padding: 2px 6px; }
+.custom-cat-form { display: flex; gap: 6px; margin-bottom: 8px; }
+.cat-input {
+  padding: 8px 10px;
+  border: 1.5px solid var(--accent-light);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+  min-width: 0;
+}
+.cat-input:focus { border-color: var(--accent); }
+.cat-input { flex: 1; }
+.cat-input-icon { flex: 0 0 56px; text-align: center; }
+.cat-input-unit { flex: 0 0 64px; }
+
+/* ─── Year in Review シェアボタン ────────────────────── */
+.yr-share {
+  position: absolute;
+  bottom: 56px; left: 50%; transform: translateX(-50%);
+  z-index: 210;
+  padding: 9px 18px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.92);
+  color: #2c2418;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.yr-share:active { transform: translateX(-50%) scale(0.96); }
+
 /* ─── レスポンシブ ───────────────────────────────────── */
 @media (max-width: 380px) {
   .mood-btn  { width: 42px; height: 42px; font-size: 20px; }
   .cal-date  { font-size: 30px; }
+  .daily-prompt-text { font-size: 11px; }
 }

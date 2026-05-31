@@ -80,6 +80,34 @@ const Accumulation = {
     return [...DEFAULT_CATEGORIES, ...(settings.customCategories || [])];
   },
 
+  getCustomCategories() {
+    return Storage.getSettings().customCategories || [];
+  },
+
+  /** カスタムカテゴリを追加（key は自動採番） */
+  addCustomCategory({ label, icon, unit, color }) {
+    const s = Storage.getSettings();
+    if (!s.customCategories) s.customCategories = [];
+    const key = 'custom-' + Date.now().toString(36);
+    s.customCategories.push({
+      key,
+      label: label || 'カスタム',
+      icon: (icon || '◆').slice(0, 2),
+      iconClass: 'custom',
+      color: color || '#e07a3a',
+      unit: unit || '回',
+      step: '1',
+    });
+    Storage.setSettings(s);
+    return key;
+  },
+
+  removeCustomCategory(key) {
+    const s = Storage.getSettings();
+    s.customCategories = (s.customCategories || []).filter((c) => c.key !== key);
+    Storage.setSettings(s);
+  },
+
   // ─── 目標管理 ───────────────────────────────────────────
   getGoals() {
     const s = Storage.getSettings();

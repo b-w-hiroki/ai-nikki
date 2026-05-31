@@ -9,6 +9,7 @@ import { Accumulation } from './accumulation.js';
 import { Gamification } from './gamification.js';
 import { DataIO } from './dataio.js';
 import { Insights } from './insights.js';
+import { Extras } from './extras.js';
 
 // ─── 定数 ───────────────────────────────────────────────
 const DAYS_JP  = ['日', '月', '火', '水', '木', '金', '土'];
@@ -41,6 +42,8 @@ function init() {
   renderTimeTravelCard();
   maybeShowOnboarding();
   updateFirstHint();
+  renderDailyPrompt();
+  renderReminder();
 
   // 気分変更コールバック
   Mood.init(() => {});
@@ -113,6 +116,19 @@ function init() {
   document.getElementById('onboardNext')?.addEventListener('click', onboardNext);
   document.getElementById('onboardSkip')?.addEventListener('click', closeOnboarding);
 
+  // 今日のお題（タップで本文に挿入）
+  document.getElementById('dailyPrompt')?.addEventListener('click', insertDailyPrompt);
+
+  // 全文検索
+  document.getElementById('btnToggleSearch')?.addEventListener('click', toggleSearch);
+  document.getElementById('searchInput')?.addEventListener('input', (e) => runSearch(e.target.value));
+
+  // カスタムカテゴリ追加
+  document.getElementById('btnAddCat')?.addEventListener('click', addCustomCategory);
+
+  // Year in Review 画像保存
+  document.getElementById('yrShare')?.addEventListener('click', shareYearReview);
+
   // Year in Review
   document.getElementById('btnYearReview')?.addEventListener('click', openYearReview);
   document.getElementById('btnCloseYr')?.addEventListener('click', closeYearReview);
@@ -157,6 +173,7 @@ function openSettings() {
   const usage = document.getElementById('settingsUsage');
   if (usage) usage.textContent = `使用容量: 約 ${Storage.getStorageUsageKB()} KB`;
   renderThemeGrid();
+  renderCustomCategories();
   document.getElementById('settingsModal')?.classList.add('show');
 }
 
@@ -427,6 +444,148 @@ function updateFirstHint() {
   hint.classList.toggle('show', !hasAnyEntry && !moodChosen);
 }
 
+// ─── 今日のお題 ──────────────────────────────────────────
+function renderDailyPrompt() {
+  const el = document.getElementById('dailyPromptText');
+  if (el) el.textContent = Extras.getDailyPrompt(Diary.todayStr());
+}
+
+function insertDailyPrompt() {
+  const ta = document.getElementById('diaryText');
+  const promptEl = document.getElementById('dailyPromptText');
+  if (!ta || !promptEl) return;
+  const line = `${promptEl.textContent}\n`;
+  if (ta.value.includes(promptEl.textContent)) { ta.focus(); return; }
+  ta.value = ta.value ? `${ta.value}\n${line}` : line;
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+
+// ─── 書き忘れリマインド ──────────────────────────────────
+function renderReminder() {
+  const banner = document.getElementById('reminderBanner');
+  if (!banner) return;
+  banner.style.display = Extras.shouldRemindToday() ? 'flex' : 'none';
+}
+
+// ─── 全文検索 ────────────────────────────────────────────
+function toggleSearch() {
+  const panel = document.getElementById('searchPanel');
+  if (!panel) return;
+  const open = panel.style.display === 'none' || !panel.style.display;
+  panel.style.display = open ? 'block' : 'none';
+  if (open) {
+    document.getElementById('searchInput')?.focus();
+  } else {
+    const input = document.getElementById('searchInput');
+    if (input) input.value = '';
+    runSearch('');
+  }
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function runSearch(query) {
+  const box = document.getElementById('searchResults');
+  if (!box) return;
+  const q = query.trim();
+  if (!q) { box.innerHTML = ''; return; }
+
+  const results = Extras.search(q);
+  if (results.length === 0) {
+    box.innerHTML = `<div class="search-empty">「${escapeHtml(q)}」に一致する日記はありません</div>`;
+    return;
+  }
+
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  box.innerHTML = results.slice(0, 30).map((r) => {
+    const idx = r.text.toLowerCase().indexOf(q.toLowerCase());
+    const start = Math.max(0, idx - 12);
+    let snippet = (start > 0 ? '…' : '') + r.text.slice(start, start + 60);
+    snippet = escapeHtml(snippet).replace(re, '<mark>$1</mark>');
+    const moodInfo = r.mood ? Mood.getMoodInfo(r.mood) : null;
+    return `<div class="search-result" data-date="${r.dateStr}">
+      <div class="search-result-head">
+        <span>${moodInfo ? moodInfo.emoji : '📝'}</span>
+        <span class="search-result-date">${Diary.formatDate(r.dateStr)}</span>
+      </div>
+      <div class="search-result-text">${snippet}</div>
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('.search-result').forEach((el) => {
+    el.addEventListener('click', () => openDayView(el.dataset.date));
+  });
+}
+
+// ─── カスタム積み上げカテゴリ ────────────────────────────
+function renderCustomCategories() {
+  const list = document.getElementById('customCatList');
+  if (!list) return;
+  const cats = Accumulation.getCustomCategories();
+  if (cats.length === 0) {
+    list.innerHTML = `<div class="search-empty" style="padding:8px">まだ追加されたカテゴリはありません</div>`;
+    return;
+  }
+  list.innerHTML = cats.map((c) => `
+    <div class="custom-cat-row">
+      <span class="ccr-icon">${c.icon}</span>
+      <span class="ccr-name">${escapeHtml(c.label)}</span>
+      <span class="ccr-unit">${escapeHtml(c.unit)}</span>
+      <button class="ccr-del" data-key="${c.key}" title="削除" aria-label="削除">✕</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('.ccr-del').forEach((b) => {
+    b.addEventListener('click', () => {
+      Accumulation.removeCustomCategory(b.dataset.key);
+      renderCustomCategories();
+      showToast('カテゴリを削除しました');
+    });
+  });
+}
+
+function addCustomCategory() {
+  const name = document.getElementById('catName');
+  const icon = document.getElementById('catIcon');
+  const unit = document.getElementById('catUnit');
+  if (!name || !name.value.trim()) { showToast('カテゴリ名を入力してください'); return; }
+
+  Accumulation.addCustomCategory({
+    label: name.value.trim(),
+    icon: icon?.value.trim() || '◆',
+    unit: unit?.value.trim() || '回',
+  });
+  name.value = ''; if (icon) icon.value = ''; if (unit) unit.value = '';
+  renderCustomCategories();
+  showToast('🎉 カテゴリを追加しました');
+}
+
+// ─── Year in Review を画像保存 ───────────────────────────
+async function shareYearReview() {
+  const slide = document.querySelectorAll('#yrSlides .yr-slide')[_yrIndex];
+  if (!slide) return;
+  if (typeof html2canvas === 'undefined') {
+    showToast('⚠️ 画像保存の準備中です。少し待って再度お試しください');
+    return;
+  }
+  showToast('🖼 画像を生成中…');
+  try {
+    const canvas = await html2canvas(slide, { scale: 2, backgroundColor: null, logging: false });
+    const url = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ai-nikki-${new Date().getFullYear()}-${_yrIndex + 1}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    showToast('✅ 画像を保存しました！');
+  } catch {
+    showToast('⚠️ 画像の生成に失敗しました');
+  }
+}
+
 // ─── バッジモーダル ──────────────────────────────────────
 function showBadgeModal(badge) {
   document.getElementById('badgeIcon').textContent  = badge.icon;
@@ -591,6 +750,41 @@ function renderProfile() {
   // 感情コレクション + 気分バランス
   renderMoodCollection();
   renderMoodBalance();
+
+  // 今週のふりかえり
+  renderWeeklyReview();
+}
+
+// ─── 今週のふりかえり ────────────────────────────────────
+function renderWeeklyReview() {
+  const strip = document.getElementById('weekStrip');
+  const summary = document.getElementById('weekSummary');
+  if (!strip || !summary) return;
+
+  const wr = Extras.getWeeklyReview();
+  const today = Diary.todayStr();
+  const DOW = ['日', '月', '火', '水', '木', '金', '土'];
+
+  strip.innerHTML = wr.days.map((d) => {
+    const dow = DOW[new Date(d.dateStr).getDay()];
+    const isToday = d.dateStr === today;
+    if (d.entry && d.entry.mood) {
+      const m = Mood.getMoodInfo(d.entry.mood);
+      return `<div class="week-day">
+        <div class="week-dot${isToday ? ' today' : ''}">${m ? m.emoji : '📝'}</div>
+        <div class="week-dow">${dow}</div>
+      </div>`;
+    }
+    return `<div class="week-day">
+      <div class="week-dot empty${isToday ? ' today' : ''}">·</div>
+      <div class="week-dow">${dow}</div>
+    </div>`;
+  }).join('');
+
+  const moodLine = wr.topMoodMeta
+    ? `よく出た気分は <strong>${wr.topMoodMeta.emoji} ${wr.topMoodMeta.label}</strong>`
+    : '気分の記録はまだありません';
+  summary.innerHTML = `この7日間で <strong>${wr.written}日</strong> 記録 ／ ${moodLine}`;
 }
 
 // ─── 感情コレクション図鑑 ────────────────────────────────

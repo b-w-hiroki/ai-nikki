@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/animations.css">
+<!-- Year in Review の画像保存用（読み込めなくても他機能は動作） -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 </head>
 <body>
 
@@ -55,6 +57,12 @@
       </div>
     </div>
 
+    <!-- 書き忘れリマインド -->
+    <div class="reminder-banner" id="reminderBanner" style="display:none">
+      <span class="reminder-icon">✍️</span>
+      <span class="reminder-text">今日はまだ記録していません。1行だけでも書いてみましょう！</span>
+    </div>
+
     <!-- 日めくりカレンダーカード -->
     <div class="calendar-card">
       <div class="calendar-inner" id="calendarInner">
@@ -79,6 +87,12 @@
             <button class="mood-btn" data-mood="awful">😢</button>
           </div>
           <div class="mood-label" id="moodLabel"></div>
+
+          <!-- 今日のお題 -->
+          <button class="daily-prompt" id="dailyPrompt" type="button" title="タップで日記に挿入">
+            <span class="daily-prompt-tag">今日のお題</span>
+            <span class="daily-prompt-text" id="dailyPromptText"></span>
+          </button>
 
           <!-- 日記テキストエリア -->
           <textarea
@@ -205,12 +219,26 @@
   ══════════════════════════════════════════ -->
   <div id="screen-calendar" class="screen">
     <header class="header">
-      <button class="icon-btn" onclick="showScreen('home')" style="font-size:18px">←</button>
+      <button class="icon-btn" onclick="showScreen('home')" aria-label="戻る">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
       <h1>カレンダー</h1>
       <div class="header-icons">
-        <button class="icon-btn" style="font-size:14px">🔍</button>
+        <button class="icon-btn" id="btnToggleSearch" aria-label="検索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </button>
       </div>
     </header>
+
+    <!-- 日記の全文検索 -->
+    <div class="search-panel" id="searchPanel" style="display:none">
+      <div class="search-input-wrap">
+        <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="searchInput" class="search-input" placeholder="日記を検索（キーワード）">
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
     <div class="calendar-month">
       <div class="month-nav">
         <button id="btnPrevMonth">‹</button>
@@ -257,10 +285,14 @@
   ══════════════════════════════════════════ -->
   <div id="screen-profile" class="screen">
     <header class="header">
-      <button class="icon-btn" onclick="showScreen('home')" style="font-size:18px">←</button>
+      <button class="icon-btn" onclick="showScreen('home')" aria-label="戻る">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
       <h1>マイページ</h1>
       <div class="header-icons">
-        <button class="icon-btn" id="btnOpenSettings" style="font-size:14px" title="設定">⚙</button>
+        <button class="icon-btn" id="btnOpenSettings" title="設定" aria-label="設定">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        </button>
       </div>
     </header>
     <div class="profile-section">
@@ -285,6 +317,13 @@
           <div class="stat-num" id="statPhotos">0</div>
           <div class="stat-label">写真数</div>
         </div>
+      </div>
+
+      <!-- 今週のふりかえり -->
+      <div class="profile-card">
+        <div class="profile-card-title">今週のふりかえり</div>
+        <div class="week-strip" id="weekStrip"></div>
+        <div class="week-summary" id="weekSummary"></div>
       </div>
 
       <!-- 今月の積み上げ -->
@@ -412,6 +451,18 @@
     </div>
 
     <div class="settings-section">
+      <div class="settings-label">積み上げカテゴリ</div>
+      <div class="settings-desc">読書・運動・勉強のほかに、続けたいことを追加できます。</div>
+      <div class="custom-cat-list" id="customCatList"></div>
+      <div class="custom-cat-form">
+        <input type="text" id="catName" class="cat-input" placeholder="名前（例: 瞑想）" maxlength="8">
+        <input type="text" id="catIcon" class="cat-input cat-input-icon" placeholder="絵文字" maxlength="2">
+        <input type="text" id="catUnit" class="cat-input cat-input-unit" placeholder="単位" maxlength="4">
+      </div>
+      <button class="settings-btn settings-btn-sub" id="btnAddCat">＋ カテゴリを追加</button>
+    </div>
+
+    <div class="settings-section">
       <div class="settings-label">データのバックアップ</div>
       <div class="settings-desc">すべての日記・写真・記録を 1 つの JSON ファイルに保存します。</div>
       <button class="settings-btn" id="btnExportData">⬇️ エクスポート（ファイルに保存）</button>
@@ -465,11 +516,12 @@
 
 <!-- Year in Review（スライド） -->
 <div class="yr-overlay" id="yrOverlay">
-  <button class="yr-close" id="btnCloseYr">✕</button>
+  <button class="yr-close" id="btnCloseYr" aria-label="閉じる">✕</button>
   <div class="yr-slides" id="yrSlides"></div>
   <div class="yr-dots" id="yrDots"></div>
-  <button class="yr-nav yr-prev" id="yrPrev">‹</button>
-  <button class="yr-nav yr-next" id="yrNext">›</button>
+  <button class="yr-nav yr-prev" id="yrPrev" aria-label="前へ">‹</button>
+  <button class="yr-nav yr-next" id="yrNext" aria-label="次へ">›</button>
+  <button class="yr-share" id="yrShare">🖼 この画面を画像で保存</button>
 </div>
 
 <script type="module" src="js/app.js"></script>
