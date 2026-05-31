@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#e07a3a">
+<title>AI Nikki — スマート日記</title>
+<link rel="manifest" href="manifest.json">
+<!-- app.html へ即リダイレクト（JS無効環境向けに meta refresh も併記） -->
+<meta http-equiv="refresh" content="0; url=app.html">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f7f3ee;
+    color: #2c2418;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    gap: 14px;
+  }
+  .logo { font-size: 28px; font-weight: 700; color: #e07a3a; }
+  .sub  { font-size: 13px; color: #8a7e6d; }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 3px solid #fdebd4;
+    border-top-color: #e07a3a;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  a { color: #e07a3a; }
+</style>
+</head>
+<body>
+  <div class="logo">AI Nikki</div>
+  <div class="spinner"></div>
+  <div class="sub">起動中…</div>
+  <noscript>
+    <p class="sub">自動で移動しない場合は <a href="app.html">こちらをタップ</a></p>
+  </noscript>
+  <script>location.replace('app.html');</script>
+</body>
+</html>
