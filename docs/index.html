@@ -8,6 +8,14 @@
 <link rel="canonical" href="https://b-w-hiroki.github.io/ai-nikki/docs/">
 <meta name="theme-color" content="#14122a">
 
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AN Docs">
+<meta name="mobile-web-app-capable" content="yes">
+
 <!-- OGP / Twitter -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="AI Nikki — 資料ハブ">
@@ -414,6 +422,15 @@
 (function () {
   'use strict';
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ─── PWA: service worker 登録（manifest の解決URLからルートを逆算） ─── */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      var man = document.querySelector('link[rel="manifest"]');
+      var base = man ? man.href.replace(/manifest\.webmanifest.*$/, '') : new URL('./', location.href).href;
+      navigator.serviceWorker.register(base + 'service-worker.js', { scope: base }).catch(function () { /* 失敗してもページは動作 */ });
+    });
+  }
 
   var modal = document.getElementById('modal');
   var modalBody = document.getElementById('modalBody');
