@@ -106,7 +106,8 @@
     background: linear-gradient(100deg, var(--accent), var(--accent2));
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .one-liner { margin-top: 18px; font-size: clamp(14px, 2.2vw, 16px); color: #d7d2e6; max-width: 640px; }
+  .one-liner { margin-top: 18px; font-size: clamp(15px, 2.2vw, 17px); color: #ece9f4; max-width: 600px; line-height: 1.85; }
+  .one-liner-sub { margin-top: 8px; font-size: 13px; color: #a39ebb; max-width: 600px; }
 
   .metrics { margin-top: 30px; display: flex; gap: 26px; flex-wrap: wrap; }
   .metric .num { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #fff; }
@@ -169,19 +170,29 @@
   .doc-item p { font-size: 12.5px; color: var(--text-sub); }
 
   /* ───── 実装の足場 ───── */
-  .impl { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
-  .impl-grid { display: grid; gap: 8px 22px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 12px; }
-  .impl-grid li { list-style: none; font-size: 13px; color: var(--text-sub); display: flex; gap: 8px; }
-  .impl-grid code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: var(--accent2); background: rgba(124,92,191,0.08); padding: 1px 6px; border-radius: 5px; }
+  .impl-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); }
+  .impl-item {
+    list-style: none; display: flex; align-items: center; gap: 10px;
+    background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 11px 14px;
+  }
+  .impl-item .ii-ico { flex-shrink: 0; color: var(--accent2); display: grid; place-items: center; }
+  .impl-item .ii-ico svg { width: 15px; height: 15px; display: block; }
+  .impl-item code { flex-shrink: 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; font-weight: 600; color: var(--accent2); }
+  .impl-item .ii-desc { font-size: 12px; color: var(--text-sub); }
 
   /* ───── ロードマップ ───── */
   .timeline { display: grid; gap: 12px; }
   .phase {
-    display: grid; grid-template-columns: 72px 1fr auto; align-items: center; gap: 14px;
+    display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 14px;
     background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 18px;
   }
-  .phase-no { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--accent2); }
-  .phase-body h4 { font-size: 14.5px; font-weight: 700; }
+  .phase-no {
+    width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+  }
+  .phase-body h4 { font-size: 14.5px; font-weight: 700; line-height: 1.4; }
   .phase-status { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
   .st-done { background: rgba(70,180,110,0.15); color: #2c7a3c; }
   .st-hold { background: rgba(180,160,80,0.16); color: #8a7330; }
@@ -235,10 +246,11 @@
   :focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
 
   @media (max-width: 560px) {
-    .phase { grid-template-columns: 54px 1fr; }
-    .phase-status { grid-column: 2; justify-self: start; margin-top: 4px; }
+    .phase { grid-template-columns: 46px 1fr; }
+    .phase-status { grid-column: 2; justify-self: start; margin-top: 6px; }
     .hero-body { margin-top: 34px; }
     .cards { margin-top: -48px; }
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
   }
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; scroll-behavior: auto; }
@@ -271,7 +283,8 @@
 
     <div class="hero-body">
       <h1 class="tagline">今日をめくる、<br><span class="grad">わたしをためる。</span></h1>
-      <p class="one-liner">日めくり感覚で気分とひとことを記録し、過去の自分とくらべて成長を実感できる無料の日記アプリ。動くプロトタイプ・仕様書・ロードマップへの入口です。</p>
+      <p class="one-liner">日めくり感覚で気分とひとことを記録し、過去の自分とくらべて成長を実感できる無料の日記アプリ。</p>
+      <p class="one-liner-sub">このページは、動くプロトタイプ・仕様書・ロードマップへの入口です。</p>
 
       <div class="metrics">
         <div class="metric"><div class="num">2</div><div class="lbl">プロトタイプ / 画面</div></div>
@@ -343,20 +356,18 @@
       <h2>実装の足場</h2>
       <p>バニラ HTML / CSS / JS（ES Modules）。ビルド不要・localStorage 駆動・API 非依存。</p>
     </div>
-    <div class="impl">
-      <ul class="impl-grid">
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>app.js</code> 画面遷移・UI制御</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>diary.js</code> 日記CRUD・タイムトラベル</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>mood.js</code> 気分スタンプ</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>photo.js</code> 写真添付・圧縮</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>accumulation.js</code> 積み上げ</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>gamification.js</code> EXP/バッジ</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>insights.js</code> 集計/図鑑/YIR</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>extras.js</code> お題/検索/週次</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>dataio.js</code> エクスポート/インポート</span></li>
-        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>storage.js</code> localStorage</span></li>
-      </ul>
-    </div>
+    <ul class="impl-grid">
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>app.js</code><span class="ii-desc">画面遷移・UI制御</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>diary.js</code><span class="ii-desc">日記CRUD</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>mood.js</code><span class="ii-desc">気分スタンプ</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>photo.js</code><span class="ii-desc">写真添付・圧縮</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>accumulation.js</code><span class="ii-desc">積み上げ</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>gamification.js</code><span class="ii-desc">EXP/バッジ</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>insights.js</code><span class="ii-desc">集計/図鑑/YIR</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>extras.js</code><span class="ii-desc">お題/検索/週次</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>dataio.js</code><span class="ii-desc">入出力</span></li>
+      <li class="impl-item"><span class="ii-ico"><svg><use href="#i-code"/></svg></span><code>storage.js</code><span class="ii-desc">localStorage</span></li>
+    </ul>
   </section>
 
   <!-- ══════ ロードマップ ══════ -->
