@@ -246,10 +246,11 @@
   :focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
 
   @media (max-width: 560px) {
-    .phase { grid-template-columns: 54px 1fr; }
-    .phase-status { grid-column: 2; justify-self: start; margin-top: 4px; }
+    .phase { grid-template-columns: 46px 1fr; }
+    .phase-status { grid-column: 2; justify-self: start; margin-top: 6px; }
     .hero-body { margin-top: 34px; }
     .cards { margin-top: -48px; }
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
   }
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; scroll-behavior: auto; }
