@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Nikki — 資料ハブ</title>
+<meta name="description" content="AI Nikki の動くプロトタイプ・仕様書・ロードマップを 1 ページに集約した資料ハブ。初めての人がここから全資料へ迷わず到達できます。">
+<link rel="canonical" href="https://b-w-hiroki.github.io/ai-nikki/docs/">
+<meta name="theme-color" content="#14122a">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AN Docs">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- OGP / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="AI Nikki — 資料ハブ">
+<meta property="og:description" content="今日をめくる、わたしをためる。動くプロトタイプ・仕様書・ロードマップへの入口。">
+<meta property="og:url" content="https://b-w-hiroki.github.io/ai-nikki/docs/">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AI Nikki — 資料ハブ">
+<meta name="twitter:description" content="今日をめくる、わたしをためる。動くプロトタイプ・仕様書・ロードマップへの入口。">
+
+<!-- Web フォント（preconnect + display=swap、1 リクエストに集約） -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --accent: #e07a3a;
+    --accent2: #7c5cbf;
+    --bg-dark: #14122a;
+    --bg: #f7f3ee;
+    --bg-card: #fffdf9;
+    --text: #2c2418;
+    --text-sub: #6f6557;
+    --text-hint: #a99c89;
+    --line: #ece4d8;
+    --radius: 16px;
+    --radius-sm: 11px;
+    --shadow-soft: 0 2px 14px rgba(20,18,42,0.06);
+    --shadow-card: 0 8px 30px rgba(20,18,42,0.10);
+    --shadow-float: 0 18px 50px rgba(20,18,42,0.28);
+    --font-display: 'Zen Maru Gothic', sans-serif;
+    --font-body: 'Noto Sans JP', sans-serif;
+  }
+
+  * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { width: 100%; max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* ───── ヒーロー ───── */
+  .hero {
+    position: relative;
+    background:
+      radial-gradient(900px 480px at 18% -10%, rgba(224,122,58,0.42), transparent 60%),
+      radial-gradient(760px 460px at 92% 8%, rgba(124,92,191,0.45), transparent 60%),
+      var(--bg-dark);
+    color: #fff;
+    padding: 30px 0 96px;
+    overflow: hidden;
+  }
+  .hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .monogram {
+    width: 46px; height: 46px; border-radius: 13px;
+    display: grid; place-items: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 19px; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 6px 18px rgba(124,92,191,0.45);
+  }
+  .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: .02em; }
+  .status-chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 600;
+    padding: 6px 13px; border-radius: 999px;
+    background: rgba(255,255,255,0.12); color: #eafaf0;
+    border: 1px solid rgba(255,255,255,0.16);
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #46e08a;
+    box-shadow: 0 0 0 0 rgba(70,224,138,0.6); animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(70,224,138,0); } 100% { box-shadow: 0 0 0 0 rgba(70,224,138,0); } }
+
+  .hero-body { margin-top: 52px; max-width: 720px; }
+  .tagline {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(30px, 6vw, 50px); line-height: 1.25; letter-spacing: .01em;
+  }
+  .tagline .grad {
+    background: linear-gradient(100deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .one-liner { margin-top: 18px; font-size: clamp(14px, 2.2vw, 16px); color: #d7d2e6; max-width: 640px; }
+
+  .metrics { margin-top: 30px; display: flex; gap: 26px; flex-wrap: wrap; }
+  .metric .num { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #fff; }
+  .metric .lbl { font-size: 12px; color: #b3adc6; margin-top: 2px; }
+
+  /* ───── カードグリッド（ヒーローに重ねる） ───── */
+  .cards {
+    margin-top: -64px;
+    display: grid; gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  .card {
+    background: var(--bg-card); border-radius: var(--radius);
+    box-shadow: var(--shadow-card); padding: 22px;
+    display: flex; flex-direction: column; gap: 12px;
+    border: 1px solid var(--line);
+  }
+  .card-ico {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: grid; place-items: center; color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+  }
+  .card-ico svg { width: 22px; height: 22px; }
+  .card h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+  .card .aud {
+    display: inline-block; font-size: 11px; font-weight: 600; color: var(--accent2);
+    background: rgba(124,92,191,0.1); padding: 3px 9px; border-radius: 999px; align-self: flex-start;
+  }
+  .card p { font-size: 13.5px; color: var(--text-sub); flex: 1; }
+  .card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 600; font-family: var(--font-body);
+    padding: 9px 14px; border-radius: 10px; border: none; cursor: pointer;
+    text-decoration: none; transition: transform .12s, background .15s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-dark, #c9692c); }
+  .btn-ghost { background: var(--bg); color: var(--text); border: 1px solid var(--line); }
+  .btn svg { width: 14px; height: 14px; }
+
+  /* ───── セクション共通 ───── */
+  section { padding: 56px 0 8px; }
+  .sec-head { margin-bottom: 22px; }
+  .sec-head h2 { font-family: var(--font-display); font-size: 23px; font-weight: 700; }
+  .sec-head p { font-size: 13.5px; color: var(--text-sub); margin-top: 4px; }
+
+  .doc-list { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .doc-item {
+    background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start;
+    cursor: pointer; transition: transform .12s, box-shadow .15s; text-align: left; width: 100%; font: inherit; color: inherit;
+  }
+  .doc-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+  .doc-item .di-ico { flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: rgba(224,122,58,0.12); color: var(--accent); }
+  .doc-item .di-ico svg { width: 19px; height: 19px; }
+  .doc-item h4 { font-size: 15px; font-weight: 700; font-family: var(--font-display); }
+  .doc-item .di-meta { font-size: 11px; color: var(--text-hint); margin: 1px 0 4px; }
+  .doc-item p { font-size: 12.5px; color: var(--text-sub); }
+
+  /* ───── 実装の足場 ───── */
+  .impl { background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+  .impl-grid { display: grid; gap: 8px 22px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 12px; }
+  .impl-grid li { list-style: none; font-size: 13px; color: var(--text-sub); display: flex; gap: 8px; }
+  .impl-grid code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: var(--accent2); background: rgba(124,92,191,0.08); padding: 1px 6px; border-radius: 5px; }
+
+  /* ───── ロードマップ ───── */
+  .timeline { display: grid; gap: 12px; }
+  .phase {
+    display: grid; grid-template-columns: 72px 1fr auto; align-items: center; gap: 14px;
+    background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 18px;
+  }
+  .phase-no { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--accent2); }
+  .phase-body h4 { font-size: 14.5px; font-weight: 700; }
+  .phase-status { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+  .st-done { background: rgba(70,180,110,0.15); color: #2c7a3c; }
+  .st-hold { background: rgba(180,160,80,0.16); color: #8a7330; }
+
+  /* ───── フッター ───── */
+  footer { margin-top: 64px; padding: 30px 0 40px; border-top: 1px solid var(--line); color: var(--text-hint); font-size: 12.5px; text-align: center; }
+  footer .f-brand { font-family: var(--font-display); font-weight: 700; color: var(--text-sub); font-size: 14px; }
+
+  /* ───── モーダル（MD / スライドビューア共通） ───── */
+  .modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(14,16,21,0.62); backdrop-filter: blur(3px); }
+  .modal.show { display: flex; }
+  .modal-box { position: relative; width: 100%; max-width: 800px; max-height: 88vh; background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow-float); display: flex; flex-direction: column; overflow: hidden; }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .modal-head h3 { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+  .modal-head .mh-actions { display: flex; align-items: center; gap: 8px; }
+  .modal-close, .src-link { background: var(--bg); border: 1px solid var(--line); border-radius: 9px; padding: 7px 11px; font-size: 12.5px; font-weight: 600; cursor: pointer; color: var(--text); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+  .modal-body { padding: 22px 24px; overflow: auto; }
+
+  /* Markdown レンダリング */
+  .md h1 { font-family: var(--font-display); font-size: 24px; margin: 6px 0 14px; }
+  .md h2 { font-family: var(--font-display); font-size: 19px; margin: 22px 0 10px; padding-bottom: 5px; border-bottom: 1px solid var(--line); }
+  .md h3 { font-family: var(--font-display); font-size: 16px; margin: 18px 0 8px; }
+  .md p { margin: 10px 0; font-size: 14px; }
+  .md ul, .md ol { margin: 10px 0 10px 22px; font-size: 14px; }
+  .md li { margin: 4px 0; }
+  .md code { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; background: rgba(124,92,191,0.1); padding: 1px 6px; border-radius: 5px; }
+  .md pre { background: #f3eee4; border: 1px solid var(--line); border-radius: 10px; padding: 14px; overflow: auto; margin: 12px 0; }
+  .md pre code { background: none; padding: 0; }
+  .md table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+  .md th, .md td { border: 1px solid var(--line); padding: 7px 11px; text-align: left; }
+  .md th { background: rgba(224,122,58,0.08); font-family: var(--font-display); }
+  .md blockquote { border-left: 3px solid var(--accent); padding: 4px 14px; margin: 12px 0; color: var(--text-sub); background: rgba(224,122,58,0.05); }
+  .md a { color: var(--accent2); text-decoration: underline; }
+  .md hr { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+
+  /* スライドビューア */
+  .slide-stage { position: relative; display: flex; align-items: center; justify-content: center; min-height: 50vh; background: var(--bg-dark); }
+  .slide-stage img { max-width: 100%; max-height: 70vh; display: block; }
+  .slide-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%; border: none; background: rgba(255,255,255,0.85); cursor: pointer; font-size: 22px; display: grid; place-items: center; }
+  .slide-prev { left: 12px; } .slide-next { right: 12px; }
+  .slide-nav:disabled { opacity: .35; cursor: default; }
+  .slide-foot { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 12px; }
+  .slide-dots { display: flex; gap: 6px; }
+  .slide-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .slide-dot.active { background: var(--accent); width: 20px; border-radius: 4px; }
+  .slide-count { font-size: 12px; color: var(--text-sub); }
+
+  .iframe-wrap { background: var(--bg-dark); }
+  .iframe-wrap iframe { width: 100%; height: 72vh; border: none; display: block; }
+
+  :focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+
+  @media (max-width: 560px) {
+    .phase { grid-template-columns: 54px 1fr; }
+    .phase-status { grid-column: 2; justify-self: start; margin-top: 4px; }
+    .hero-body { margin-top: 34px; }
+    .cards { margin-top: -48px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG シンボル定義 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></symbol>
+  <symbol id="i-layout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></symbol>
+  <symbol id="i-spec" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 5-6"/><rect x="3" y="3" width="18" height="18" rx="2"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></symbol>
+</svg>
+
+<!-- ══════ ヒーロー ══════ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <div class="brand">
+        <div class="monogram" aria-hidden="true">AN</div>
+        <span class="brand-name">AI Nikki</span>
+      </div>
+      <span class="status-chip"><span class="status-dot" aria-hidden="true"></span>公開中・稼働中</span>
+    </div>
+
+    <div class="hero-body">
+      <h1 class="tagline">今日をめくる、<br><span class="grad">わたしをためる。</span></h1>
+      <p class="one-liner">日めくり感覚で気分とひとことを記録し、過去の自分とくらべて成長を実感できる無料の日記アプリ。動くプロトタイプ・仕様書・ロードマップへの入口です。</p>
+
+      <div class="metrics">
+        <div class="metric"><div class="num">2</div><div class="lbl">プロトタイプ / 画面</div></div>
+        <div class="metric"><div class="num">2</div><div class="lbl">仕様書ドキュメント</div></div>
+        <div class="metric"><div class="num">10</div><div class="lbl">実装モジュール</div></div>
+        <div class="metric"><div class="num">5</div><div class="lbl">フェーズ</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ══════ カードグリッド（プロトタイプ/画面） ══════ -->
+  <div class="cards" id="cards">
+    <article class="card">
+      <div class="card-ico"><svg><use href="#i-play"/></svg></div>
+      <h3>本体アプリ</h3>
+      <span class="aud">対象：ユーザー</span>
+      <p>全機能入りの動く SPA。気分記録・日めくり・カレンダー・感情コレクション・Year in Review まで体験できます。</p>
+      <div class="card-actions">
+        <a class="btn btn-primary" href="../app.html" target="_blank" rel="noopener">開く <svg><use href="#i-ext"/></svg></a>
+        <button class="btn btn-ghost" data-view="iframe" data-src="../app.html" data-title="本体アプリ">このページで見る <svg><use href="#i-eye"/></svg></button>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-ico"><svg><use href="#i-layout"/></svg></div>
+      <h3>Phase 1 モック</h3>
+      <span class="aud">対象：企画 / デザイン</span>
+      <p>初期 UI モック（単一 HTML）。日めくりホームのレイアウトと世界観の出発点となったデザイン検証用ファイル。</p>
+      <div class="card-actions">
+        <a class="btn btn-primary" href="../ai-nikki-phase1-mock.html" target="_blank" rel="noopener">開く <svg><use href="#i-ext"/></svg></a>
+        <button class="btn btn-ghost" data-view="iframe" data-src="../ai-nikki-phase1-mock.html" data-title="Phase 1 モック">このページで見る <svg><use href="#i-eye"/></svg></button>
+      </div>
+    </article>
+  </div>
+
+  <!-- ══════ 仕様書 / ドキュメント ══════ -->
+  <section id="docs">
+    <div class="sec-head">
+      <h2>仕様書 / ドキュメント</h2>
+      <p>クリックでこのページ内のビューアが開きます（読み込めない場合は元ファイルへ）。</p>
+    </div>
+    <div class="doc-list">
+      <button class="doc-item" data-view="md" data-src="../README.md" data-title="README — プロジェクト概要">
+        <span class="di-ico"><svg><use href="#i-doc"/></svg></span>
+        <span>
+          <h4>README</h4>
+          <div class="di-meta">Markdown ・ 対象：全員</div>
+          <p>機能一覧・技術スタック・ファイル構成・ロードマップ。まずここから。</p>
+        </span>
+      </button>
+
+      <button class="doc-item" data-view="md" data-src="../AI-NIKKI-CURSOR-PROMPT.md" data-title="開発プロンプト / 仕様書">
+        <span class="di-ico"><svg><use href="#i-spec"/></svg></span>
+        <span>
+          <h4>開発プロンプト / 仕様書</h4>
+          <div class="di-meta">Markdown ・ 対象：開発 / 企画</div>
+          <p>コンセプト・デザインシステム・5 画面設計・ゲーミフィケーション仕様の詳細。</p>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════ 実装の足場 ══════ -->
+  <section id="impl">
+    <div class="sec-head">
+      <h2>実装の足場</h2>
+      <p>バニラ HTML / CSS / JS（ES Modules）。ビルド不要・localStorage 駆動・API 非依存。</p>
+    </div>
+    <div class="impl">
+      <ul class="impl-grid">
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>app.js</code> 画面遷移・UI制御</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>diary.js</code> 日記CRUD・タイムトラベル</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>mood.js</code> 気分スタンプ</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>photo.js</code> 写真添付・圧縮</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>accumulation.js</code> 積み上げ</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>gamification.js</code> EXP/バッジ</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>insights.js</code> 集計/図鑑/YIR</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>extras.js</code> お題/検索/週次</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>dataio.js</code> エクスポート/インポート</span></li>
+        <li><svg width="16" height="16" style="color:var(--accent2)"><use href="#i-code"/></svg><span><code>storage.js</code> localStorage</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══════ ロードマップ ══════ -->
+  <section id="roadmap">
+    <div class="sec-head">
+      <h2>ロードマップ</h2>
+      <p>README のフェーズ表に準拠。AI 機能（Phase 2/3）は API 課金回避のため現在保留中。</p>
+    </div>
+    <div class="timeline">
+      <div class="phase">
+        <div class="phase-no">P1</div>
+        <div class="phase-body"><h4>日めくりホーム・保存・ゲーミフィケーション基盤</h4></div>
+        <span class="phase-status st-done">✅ 完了</span>
+      </div>
+      <div class="phase">
+        <div class="phase-no">P2</div>
+        <div class="phase-body"><h4>カレンダー詳細 + タイムトラベル + AI 感情分析</h4></div>
+        <span class="phase-status st-hold">🅿️ AI部分は保留</span>
+      </div>
+      <div class="phase">
+        <div class="phase-no">P3</div>
+        <div class="phase-body"><h4>AI 深堀りチャット + 週次レポート</h4></div>
+        <span class="phase-status st-hold">🅿️ AI保留</span>
+      </div>
+      <div class="phase">
+        <div class="phase-no">P4</div>
+        <div class="phase-body"><h4>テーマ切替 + データ入出力 + 感情コレクション</h4></div>
+        <span class="phase-status st-done">✅ 完了</span>
+      </div>
+      <div class="phase">
+        <div class="phase-no">P5</div>
+        <div class="phase-body"><h4>Year in Review（Spotify Wrapped 風）</h4></div>
+        <span class="phase-status st-done">✅ 完了</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-brand">AI Nikki</div>
+    <p>今日をめくる、わたしをためる。 — 動くプロトタイプ・仕様書・ロードマップの資料ハブ。</p>
+    <p style="margin-top:8px">© <span id="year"></span> AI Nikki</p>
+  </div>
+</footer>
+
+<!-- ══════ モーダル ══════ -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">資料</h3>
+      <div class="mh-actions">
+        <a class="src-link" id="modalSrc" href="#" target="_blank" rel="noopener">元ファイル <svg width="13" height="13"><use href="#i-ext"/></svg></a>
+        <button class="modal-close" id="modalClose" aria-label="閉じる">✕ 閉じる</button>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ─── PWA: service worker 登録（manifest の解決URLからルートを逆算） ─── */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      var man = document.querySelector('link[rel="manifest"]');
+      var base = man ? man.href.replace(/manifest\.webmanifest.*$/, '') : new URL('./', location.href).href;
+      navigator.serviceWorker.register(base + 'service-worker.js', { scope: base }).catch(function () { /* 失敗してもページは動作 */ });
+    });
+  }
+
+  var modal = document.getElementById('modal');
+  var modalBody = document.getElementById('modalBody');
+  var modalTitle = document.getElementById('modalTitle');
+  var modalSrc = document.getElementById('modalSrc');
+  var lastFocus = null;
+
+  /* ─── 軽量 Markdown レンダラ（外部依存なし） ─── */
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function inline(s) {
+    s = s.replace(/`([^`]+)`/g, function (_, c) { return '<code>' + escapeHtml(c) + '</code>'; });
+    s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2" loading="lazy" style="max-width:100%">');
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+    return s;
+  }
+  function renderMarkdown(md) {
+    var lines = md.replace(/\r\n/g, '\n').split('\n');
+    var html = '', i = 0, inList = false, listTag = '';
+    function closeList() { if (inList) { html += '</' + listTag + '>'; inList = false; } }
+    while (i < lines.length) {
+      var line = lines[i];
+      // コードブロック
+      if (/^```/.test(line)) {
+        closeList();
+        var buf = []; i++;
+        while (i < lines.length && !/^```/.test(lines[i])) { buf.push(lines[i]); i++; }
+        html += '<pre><code>' + escapeHtml(buf.join('\n')) + '</code></pre>'; i++; continue;
+      }
+      // テーブル（ヘッダ + 区切り行）
+      if (/\|/.test(line) && i + 1 < lines.length && /^\s*\|?[\s:\-|]+\|?\s*$/.test(lines[i + 1]) && /-/.test(lines[i + 1])) {
+        closeList();
+        var head = line.split('|').map(function (c) { return c.trim(); }).filter(function (c, idx, a) { return !(idx === 0 && c === '') && !(idx === a.length - 1 && c === ''); });
+        html += '<table><thead><tr>' + head.map(function (c) { return '<th>' + inline(escapeHtml(c)) + '</th>'; }).join('') + '</tr></thead><tbody>';
+        i += 2;
+        while (i < lines.length && /\|/.test(lines[i]) && lines[i].trim() !== '') {
+          var cells = lines[i].split('|').map(function (c) { return c.trim(); }).filter(function (c, idx, a) { return !(idx === 0 && c === '') && !(idx === a.length - 1 && c === ''); });
+          html += '<tr>' + cells.map(function (c) { return '<td>' + inline(escapeHtml(c)) + '</td>'; }).join('') + '</tr>';
+          i++;
+        }
+        html += '</tbody></table>'; continue;
+      }
+      var h = line.match(/^(#{1,4})\s+(.*)$/);
+      if (h) { closeList(); html += '<h' + h[1].length + '>' + inline(escapeHtml(h[2])) + '</h' + h[1].length + '>'; i++; continue; }
+      if (/^>\s?/.test(line)) { closeList(); html += '<blockquote>' + inline(escapeHtml(line.replace(/^>\s?/, ''))) + '</blockquote>'; i++; continue; }
+      if (/^(---|\*\*\*)\s*$/.test(line)) { closeList(); html += '<hr>'; i++; continue; }
+      var ul = line.match(/^\s*[-*]\s+(.*)$/);
+      var ol = line.match(/^\s*\d+\.\s+(.*)$/);
+      if (ul || ol) {
+        var want = ul ? 'ul' : 'ol';
+        if (!inList || listTag !== want) { closeList(); listTag = want; html += '<' + want + '>'; inList = true; }
+        html += '<li>' + inline(escapeHtml((ul || ol)[1])) + '</li>'; i++; continue;
+      }
+      if (line.trim() === '') { closeList(); i++; continue; }
+      closeList(); html += '<p>' + inline(escapeHtml(line)) + '</p>'; i++;
+    }
+    closeList();
+    return html;
+  }
+
+  /* ─── モーダル開閉 ─── */
+  function openModal(title, srcHref) {
+    lastFocus = document.activeElement;
+    modalTitle.textContent = title;
+    if (srcHref) { modalSrc.href = srcHref; modalSrc.style.display = ''; } else { modalSrc.style.display = 'none'; }
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('modalClose').focus();
+  }
+  function closeModal() {
+    modal.classList.remove('show');
+    modalBody.innerHTML = '';
+    document.body.style.overflow = '';
+    if (lastFocus) lastFocus.focus();
+  }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.classList.contains('show')) closeModal(); });
+
+  /* ─── Markdown ビューア（fetch 失敗時は元ファイルへ） ─── */
+  function viewMarkdown(src, title) {
+    openModal(title, src);
+    modalBody.innerHTML = '<p style="color:var(--text-hint)">読み込み中…</p>';
+    fetch(src).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function (text) { modalBody.innerHTML = '<div class="md">' + renderMarkdown(text) + '</div>'; })
+      .catch(function () {
+        modalBody.innerHTML = '<div class="md"><p>このビューアでは表示できませんでした。</p><p><a href="' + src + '" target="_blank" rel="noopener">元ファイルを開く ↗</a></p></div>';
+      });
+  }
+
+  /* ─── iframe ビューア（プロトタイプをページ内で） ─── */
+  function viewIframe(src, title) {
+    openModal(title, src);
+    modalBody.innerHTML = '<div class="iframe-wrap"><iframe src="' + src + '" title="' + title + '" loading="lazy"></iframe></div>';
+    modalBody.style.padding = '0';
+  }
+
+  /* ─── スライドビューア（連番画像・将来のスライド追加用） ─── */
+  function viewSlides(images, title) {
+    openModal(title, images[0] || null);
+    var idx = 0;
+    function render() {
+      modalBody.style.padding = '0';
+      modalBody.innerHTML =
+        '<div class="slide-stage">' +
+          '<button class="slide-nav slide-prev" aria-label="前へ">‹</button>' +
+          '<img src="' + images[idx] + '" alt="' + title + ' スライド ' + (idx + 1) + '" loading="lazy">' +
+          '<button class="slide-nav slide-next" aria-label="次へ">›</button>' +
+        '</div>' +
+        '<div class="slide-foot"><div class="slide-dots">' +
+          images.map(function (_, i) { return '<span class="slide-dot' + (i === idx ? ' active' : '') + '"></span>'; }).join('') +
+        '</div><span class="slide-count">' + (idx + 1) + ' / ' + images.length + '</span></div>';
+      var prev = modalBody.querySelector('.slide-prev');
+      var next = modalBody.querySelector('.slide-next');
+      prev.disabled = idx === 0; next.disabled = idx === images.length - 1;
+      prev.onclick = function () { if (idx > 0) { idx--; render(); } };
+      next.onclick = function () { if (idx < images.length - 1) { idx++; render(); } };
+    }
+    render();
+    modal._slideKey = function (e) {
+      if (e.key === 'ArrowLeft') { var p = modalBody.querySelector('.slide-prev'); if (p && !p.disabled) p.click(); }
+      if (e.key === 'ArrowRight') { var n = modalBody.querySelector('.slide-next'); if (n && !n.disabled) n.click(); }
+    };
+    document.addEventListener('keydown', modal._slideKey);
+  }
+
+  /* ─── 委譲：data-view を持つ要素 ─── */
+  document.querySelectorAll('[data-view]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var kind = el.dataset.view, src = el.dataset.src, title = el.dataset.title || '資料';
+      modalBody.style.padding = '';
+      if (kind === 'md') viewMarkdown(src, title);
+      else if (kind === 'iframe') viewIframe(src, title);
+      else if (kind === 'slides') viewSlides((el.dataset.images || '').split(',').filter(Boolean), title);
+    });
+  });
+})();
+</script>
+</body>
+</html>
