@@ -874,23 +874,23 @@ function openYearReview() {
   const slides = [
     {
       cls: 'yr-gradient-1',
-      html: `<h2>${r.year}年のあなた</h2>
-        <div class="yr-emoji-hero">📖</div>
-        <div class="yr-big">${r.totalEntries}<span style="font-size:24px">日</span></div>
+      html: `<h2 data-depth="6">${r.year}年のあなた</h2>
+        <div class="yr-emoji-hero" data-depth="20">📖</div>
+        <div class="yr-big"><span class="yr-count" data-count="${r.totalEntries}">0</span><span style="font-size:24px">日</span></div>
         <div class="yr-sub">日記を書きました</div>
-        <div class="yr-stat-row">
-          <div><div class="yr-stat-num">${r.totalWords.toLocaleString()}</div><div class="yr-stat-lbl">文字</div></div>
-          <div><div class="yr-stat-num">${r.photoCount}</div><div class="yr-stat-lbl">写真</div></div>
-          <div><div class="yr-stat-num">${r.longestStreak}</div><div class="yr-stat-lbl">最長連続</div></div>
+        <div class="yr-stat-row" data-depth="10">
+          <div><div class="yr-stat-num"><span class="yr-count" data-count="${r.totalWords}">0</span></div><div class="yr-stat-lbl">文字</div></div>
+          <div><div class="yr-stat-num"><span class="yr-count" data-count="${r.photoCount}">0</span></div><div class="yr-stat-lbl">写真</div></div>
+          <div><div class="yr-stat-num"><span class="yr-count" data-count="${r.longestStreak}">0</span></div><div class="yr-stat-lbl">最長連続</div></div>
         </div>`,
     },
     {
       cls: 'yr-gradient-2',
-      html: `<h2>いちばんの気分</h2>
-        <div class="yr-emoji-hero">${peakMeta.emoji}</div>
+      html: `<h2 data-depth="6">いちばんの気分</h2>
+        <div class="yr-emoji-hero" data-depth="20">${peakMeta.emoji}</div>
         <div class="yr-big" style="font-size:32px">${peakMeta.label}</div>
-        <div class="yr-sub">を ${moodPeak[1]} 回記録しました</div>
-        <div style="margin-top:24px">
+        <div class="yr-sub">を <span class="yr-count" data-count="${moodPeak[1]}">0</span> 回記録しました</div>
+        <div style="margin-top:24px" data-depth="10">
           ${Insights.MOOD_ORDER.map((id) => {
             const m = Insights.MOOD_META[id];
             return `<div class="yr-mood-line">${m.emoji} ${'■'.repeat(Math.min(20, r.moodCounts[id]))} ${r.moodCounts[id]}</div>`;
@@ -899,27 +899,27 @@ function openYearReview() {
     },
     {
       cls: 'yr-gradient-3',
-      html: `<h2>感情の旅路</h2>
-        <div class="yr-emoji-hero">🗓️</div>
+      html: `<h2 data-depth="6">感情の旅路</h2>
+        <div class="yr-emoji-hero" data-depth="20">🗓️</div>
         <div class="yr-sub" style="font-size:16px">いちばん活発だったのは</div>
         <div class="yr-big" style="font-size:40px">${monthName(r.topMonth)}</div>
-        <div class="yr-sub">（${r.monthCounts[r.topMonth]} 件の記録）</div>
+        <div class="yr-sub">（<span class="yr-count" data-count="${r.monthCounts[r.topMonth]}">0</span> 件の記録）</div>
         <div class="yr-sub" style="margin-top:20px">いちばんポジティブだったのは <strong>${monthName(r.bestMonth)}</strong></div>`,
     },
     {
       cls: 'yr-gradient-4',
-      html: `<h2>積み上げの1年</h2>
-        <div class="yr-emoji-hero">🏔️</div>
-        <div class="yr-stat-row" style="flex-direction:column;gap:12px">
-          <div><div class="yr-stat-num">📚 ${acc.reading.toLocaleString()}</div><div class="yr-stat-lbl">読書ページ</div></div>
-          <div><div class="yr-stat-num">💪 ${acc.exercise.toLocaleString()}</div><div class="yr-stat-lbl">運動の分数</div></div>
-          <div><div class="yr-stat-num">✏️ ${acc.study.toLocaleString()}</div><div class="yr-stat-lbl">勉強の時間</div></div>
+      html: `<h2 data-depth="6">積み上げの1年</h2>
+        <div class="yr-emoji-hero" data-depth="20">🏔️</div>
+        <div class="yr-stat-row" style="flex-direction:column;gap:12px" data-depth="10">
+          <div><div class="yr-stat-num">📚 <span class="yr-count" data-count="${acc.reading}">0</span></div><div class="yr-stat-lbl">読書ページ</div></div>
+          <div><div class="yr-stat-num">💪 <span class="yr-count" data-count="${acc.exercise}">0</span></div><div class="yr-stat-lbl">運動の分数</div></div>
+          <div><div class="yr-stat-num">✏️ <span class="yr-count" data-count="${acc.study}">0</span></div><div class="yr-stat-lbl">勉強の時間</div></div>
         </div>`,
     },
     {
       cls: 'yr-gradient-5',
-      html: `<h2>来年へ</h2>
-        <div class="yr-emoji-hero">🎉</div>
+      html: `<h2 data-depth="6">来年へ</h2>
+        <div class="yr-emoji-hero" data-depth="20">🎉</div>
         <div class="yr-big" style="font-size:28px">おつかれさま！</div>
         <div class="yr-sub" style="margin-top:12px;line-height:1.8">
           ${r.year}年も よく書きました。<br>
@@ -945,6 +945,8 @@ function moveYrSlide(delta) {
   updateYrSlide();
 }
 
+const _prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function updateYrSlide() {
   const slides = document.getElementById('yrSlides');
   if (slides) slides.style.transform = `translateX(-${_yrIndex * 100}%)`;
@@ -957,10 +959,73 @@ function updateYrSlide() {
   const next = document.getElementById('yrNext');
   if (prev) prev.disabled = _yrIndex === 0;
   if (next) next.disabled = _yrIndex === _yrTotal - 1;
+
+  // 現在スライドの演出
+  const slideEls = document.querySelectorAll('#yrSlides .yr-slide');
+  slideEls.forEach((el, i) => {
+    // パララックス：深さ別に少しズラして入場
+    el.querySelectorAll('[data-depth]').forEach((node) => {
+      const depth = parseFloat(node.dataset.depth) || 0;
+      if (_prefersReducedMotion) { node.style.transform = ''; node.style.opacity = ''; return; }
+      if (i === _yrIndex) {
+        node.style.transition = 'transform .6s cubic-bezier(.23,1,.32,1), opacity .5s ease';
+        node.style.transform = 'translateY(0)';
+        node.style.opacity = '1';
+      } else {
+        node.style.transition = 'none';
+        node.style.transform = `translateY(${depth}px)`;
+        node.style.opacity = '0';
+      }
+    });
+  });
+
+  // カウントアップ（現在スライド内）
+  const cur = slideEls[_yrIndex];
+  if (cur) cur.querySelectorAll('.yr-count').forEach((el) => animateCount(el));
+
+  // 最終スライドで紙吹雪
+  if (_yrIndex === _yrTotal - 1) launchConfetti();
+}
+
+function animateCount(el) {
+  const target = parseInt(el.dataset.count, 10) || 0;
+  if (_prefersReducedMotion) { el.textContent = target.toLocaleString(); return; }
+  const dur = 900;
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+    el.textContent = Math.round(target * eased).toLocaleString();
+    if (t < 1) requestAnimationFrame(tick);
+    else el.textContent = target.toLocaleString();
+  }
+  requestAnimationFrame(tick);
+}
+
+function launchConfetti() {
+  if (_prefersReducedMotion) return;
+  const overlay = document.getElementById('yrOverlay');
+  if (!overlay || overlay._confettiDone) return;
+  overlay._confettiDone = true;
+  const colors = ['#e07a3a', '#7c5cbf', '#46e08a', '#ffab40', '#ff6d88', '#5c9ce6'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('span');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.top = '-12px';
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDelay = (Math.random() * 0.4) + 's';
+    piece.style.animationDuration = (1.4 + Math.random() * 1.1) + 's';
+    if (Math.random() > 0.5) piece.style.borderRadius = '50%';
+    overlay.appendChild(piece);
+    setTimeout(() => piece.remove(), 2800);
+  }
 }
 
 function closeYearReview() {
-  document.getElementById('yrOverlay').classList.remove('show');
+  const overlay = document.getElementById('yrOverlay');
+  overlay.classList.remove('show');
+  overlay._confettiDone = false;
 }
 
 // ─── 積み上げ目標モーダル ─────────────────────────────────
