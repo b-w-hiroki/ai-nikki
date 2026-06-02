@@ -10,6 +10,7 @@ import { Gamification } from './gamification.js';
 import { DataIO } from './dataio.js';
 import { Insights } from './insights.js';
 import { Extras } from './extras.js';
+import { AI } from './ai.js';
 
 // ─── 定数 ───────────────────────────────────────────────
 const DAYS_JP  = ['日', '月', '火', '水', '木', '金', '土'];
@@ -134,6 +135,12 @@ function init() {
   document.getElementById('btnCloseYr')?.addEventListener('click', closeYearReview);
   document.getElementById('yrPrev')?.addEventListener('click', () => moveYrSlide(-1));
   document.getElementById('yrNext')?.addEventListener('click', () => moveYrSlide(1));
+
+  // AIチャット
+  document.getElementById('chatSend')?.addEventListener('click', sendChat);
+  document.getElementById('chatInput')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendChat();
+  });
 
   // 設定モーダル
   document.getElementById('btnOpenSettings')?.addEventListener('click', openSettings);
@@ -362,6 +369,10 @@ async function saveDiary() {
   }
 
   renderStreakBar();
+
+  // AIひとこと（内蔵AI対応ブラウザのみ・非対応なら何も起きない）
+  const moodLabel = mood && Mood.getMoodInfo ? (Mood.getMoodInfo(mood)?.label || '') : '';
+  maybeAddAiComment(text, moodLabel);
 }
 
 // ─── 保存アニメーション ──────────────────────────────────
@@ -612,6 +623,7 @@ function showScreen(name) {
 
   if (name === 'calendar') renderCalendarGrid();
   if (name === 'profile')  renderProfile();
+  if (name === 'chat')     setupChat();
 }
 
 // ─── カレンダー画面 ──────────────────────────────────────
@@ -961,6 +973,130 @@ function updateYrSlide() {
 
 function closeYearReview() {
   document.getElementById('yrOverlay').classList.remove('show');
+}
+
+// ─── AIチャット（ブラウザ内蔵AI） ────────────────────────
+let _chatSession = null;
+let _chatBusy = false;
+
+async function setupChat() {
+  const wrap = document.getElementById('chatWrap');
+  const unsupported = document.getElementById('chatUnsupported');
+  if (!wrap || !unsupported) return;
+
+  const status = await AI.availability();
+
+  if (status === 'no-api' || status === 'unavailable') {
+    wrap.style.display = 'none';
+    unsupported.style.display = '';
+    return;
+  }
+
+  // 対応あり（available / downloadable / downloading）
+  unsupported.style.display = 'none';
+  wrap.style.display = 'flex';
+
+  // 初回の挨拶（ログが空のとき）
+  const log = document.getElementById('chatLog');
+  if (log && log.children.length === 0) {
+    if (status === 'downloadable' || status === 'downloading') {
+      addChatMsg('ai', '初回はAIモデルの準備に少し時間がかかることがあります。メッセージを送ると準備を始めます。');
+    } else {
+      addChatMsg('ai', 'こんにちは。今日はどんな一日でしたか？ 気になっていることでも、うれしかったことでも、気軽に聞かせてください。');
+    }
+  }
+}
+
+function addChatMsg(role, text) {
+  const log = document.getElementById('chatLog');
+  if (!log) return null;
+  const el = document.createElement('div');
+  el.className = `chat-msg ${role}`;
+  el.textContent = text;
+  log.appendChild(el);
+  log.scrollTop = log.scrollHeight;
+  return el;
+}
+
+async function sendChat() {
+  if (_chatBusy) return;
+  const input = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('chatSend');
+  const text = (input?.value || '').trim();
+  if (!text) return;
+
+  addChatMsg('user', text);
+  input.value = '';
+  _chatBusy = true;
+  if (sendBtn) sendBtn.disabled = true;
+
+  const thinking = addChatMsg('ai', '…');
+  if (thinking) thinking.classList.add('thinking');
+
+  try {
+    if (!_chatSession) {
+      // 直近の日記を少しだけ文脈に渡す
+      const recent = recentDiaryContext();
+      _chatSession = await AI.createSession(recent);
+    }
+    if (!_chatSession) throw new Error('no-session');
+
+    const reply = await _chatSession.prompt(text);
+    if (thinking) {
+      thinking.classList.remove('thinking');
+      thinking.textContent = (reply || '').trim() || 'うまく応答できませんでした。もう一度試してみてください。';
+    }
+  } catch {
+    if (thinking) {
+      thinking.classList.remove('thinking');
+      thinking.textContent = '⚠️ 応答の生成に失敗しました。ブラウザのAI機能が使えない可能性があります。';
+    }
+  } finally {
+    _chatBusy = false;
+    if (sendBtn) sendBtn.disabled = false;
+    const log = document.getElementById('chatLog');
+    if (log) log.scrollTop = log.scrollHeight;
+  }
+}
+
+/** 直近3日分の日記を文脈用テキストに（プライバシーは端末内なので外部送信なし） */
+function recentDiaryContext() {
+  const entries = Storage.getEntries();
+  const keys = Object.keys(entries).sort((a, b) => b.localeCompare(a)).slice(0, 3);
+  if (keys.length === 0) return '';
+  const lines = keys.map((k) => {
+    const e = entries[k];
+    const mood = e.mood && Mood.getMoodInfo ? (Mood.getMoodInfo(e.mood)?.label || '') : '';
+    return `- ${k}（${mood}）: ${(e.text || '').slice(0, 80)}`;
+  });
+  return '参考までに、ユーザーの最近の日記です（必要なときだけ触れてください）:\n' + lines.join('\n');
+}
+
+// ─── AIひとこと（保存後・内蔵AI対応時のみ） ──────────────
+async function maybeAddAiComment(text, moodLabel) {
+  const box = document.getElementById('aiComment');
+  const body = document.getElementById('aiCommentBody');
+  if (!box || !body) return;
+  if (!text || text.trim().length < 4) return;
+
+  const status = await AI.availability();
+  if (status === 'no-api' || status === 'unavailable') return;
+
+  box.style.display = '';
+  body.classList.add('loading');
+  body.textContent = '考えています…';
+
+  const prompt =
+    `次は今日の日記です。気分は「${moodLabel || '未選択'}」。` +
+    `2文以内で、共感のひとことと、よければ小さな問いかけを返してください。\n\n日記:\n${text}`;
+  const reply = await AI.prompt(prompt);
+
+  body.classList.remove('loading');
+  if (reply) {
+    body.textContent = reply;
+  } else {
+    box.style.display = 'none';
+  }
 }
 
 // ─── 積み上げ目標モーダル ─────────────────────────────────

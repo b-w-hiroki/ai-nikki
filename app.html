@@ -202,6 +202,12 @@
 
           <!-- 保存ボタン -->
           <button class="save-btn" id="saveBtn">今日の記録を保存する</button>
+
+          <!-- AIひとこと（内蔵AI対応時のみ・保存後に表示） -->
+          <div class="ai-comment" id="aiComment" style="display:none">
+            <div class="ai-comment-head"><span class="ai-comment-ico">🤖</span> AIからのひとこと</div>
+            <div class="ai-comment-body" id="aiCommentBody"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -268,17 +274,33 @@
       <h1>AIチャット</h1>
       <div style="width:36px"></div>
     </header>
-    <div class="coming-soon">
+
+    <!-- 内蔵AI 非対応時のフォールバック -->
+    <div class="coming-soon" id="chatUnsupported" style="display:none">
       <div class="coming-soon-icon">🤖</div>
-      <div class="coming-soon-title">準備中の機能です</div>
+      <div class="coming-soon-title">このブラウザでは使えません</div>
       <div class="coming-soon-text">
-        ここでは将来、書いた日記に AI が
-        やさしく問いかけたり、ふりかえりを
-        手伝ってくれる予定です。<br><br>
-        まずは <strong>「日記」タブ</strong> から
-        今日の出来事を記録してみましょう。
+        AIチャットは、お使いの端末・ブラウザに内蔵された
+        AI（追加料金なし）で動きます。<br><br>
+        対応ブラウザ（最新の Chrome など）で開くと、
+        書いた日記について AI とやさしく対話できます。<br><br>
+        いまは <strong>「日記」タブ</strong> で記録を続けましょう。
       </div>
       <button class="coming-soon-btn" onclick="showScreen('home')">日記を書く</button>
+    </div>
+
+    <!-- 内蔵AI 対応時のチャットUI -->
+    <div class="chat-wrap" id="chatWrap" style="display:none">
+      <div class="chat-note" id="chatNote">
+        💡 会話は端末内のAIで処理され、外部に送信されません。
+      </div>
+      <div class="chat-log" id="chatLog"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" class="chat-input" placeholder="メッセージを入力…" autocomplete="off">
+        <button class="chat-send" id="chatSend" aria-label="送信">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
     </div>
   </div><!-- /screen-chat -->
 
