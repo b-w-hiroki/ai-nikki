@@ -185,9 +185,14 @@
   /* ───── ロードマップ ───── */
   .timeline { display: grid; gap: 12px; }
   .phase {
-    display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 14px;
-    background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 18px;
+    background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    overflow: hidden;
   }
+  .phase-head {
+    display: grid; grid-template-columns: 46px 1fr auto auto; align-items: center; gap: 14px;
+    padding: 14px 18px; cursor: pointer; list-style: none; user-select: none;
+  }
+  .phase-head::-webkit-details-marker { display: none; }
   .phase-no {
     width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center;
     font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #fff;
@@ -197,6 +202,21 @@
   .phase-status { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
   .st-done { background: rgba(70,180,110,0.15); color: #2c7a3c; }
   .st-hold { background: rgba(180,160,80,0.16); color: #8a7330; }
+  .st-part { background: rgba(124,92,191,0.14); color: #6a4caf; }
+  .phase-caret { color: var(--text-hint); transition: transform .2s; display: grid; place-items: center; }
+  .phase-caret svg { width: 16px; height: 16px; }
+  details[open] .phase-caret { transform: rotate(180deg); }
+  .phase-items { padding: 2px 18px 16px; display: grid; gap: 7px; border-top: 1px solid var(--line); margin-top: 2px; }
+  .phase-item {
+    display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--text-sub); padding: 6px 0;
+  }
+  .pi-mark { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; }
+  .pi-done { background: rgba(70,180,110,0.18); color: #2c7a3c; }
+  .pi-hold { background: rgba(180,160,80,0.2); color: #8a7330; }
+  .pi-part { background: rgba(124,92,191,0.18); color: #6a4caf; }
+  .pi-todo { background: var(--line); color: var(--text-hint); }
+  .pi-note { font-size: 11px; color: var(--text-hint); white-space: nowrap; }
 
   /* ───── フッター ───── */
   footer { margin-top: 64px; padding: 30px 0 40px; border-top: 1px solid var(--line); color: var(--text-hint); font-size: 12.5px; text-align: center; }
@@ -269,6 +289,7 @@
   <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></symbol>
   <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></symbol>
 </svg>
 
 <!-- ══════ ヒーロー ══════ -->
@@ -375,34 +396,90 @@
   <section id="roadmap">
     <div class="sec-head">
       <h2>ロードマップ</h2>
-      <p>README のフェーズ表に準拠。AI 機能（Phase 2/3）は API 課金回避のため現在保留中。</p>
+      <p>各フェーズをタップすると詳細項目が開きます。凡例：✓ 完了 ／ ◐ 一部 ／ 🅿 保留(AI・課金回避) ／ □ 未着手</p>
     </div>
     <div class="timeline">
-      <div class="phase">
-        <div class="phase-no">P1</div>
-        <div class="phase-body"><h4>日めくりホーム・保存・ゲーミフィケーション基盤</h4></div>
-        <span class="phase-status st-done">✅ 完了</span>
-      </div>
-      <div class="phase">
-        <div class="phase-no">P2</div>
-        <div class="phase-body"><h4>カレンダー詳細 + タイムトラベル + AI 感情分析</h4></div>
-        <span class="phase-status st-hold">🅿️ AI部分は保留</span>
-      </div>
-      <div class="phase">
-        <div class="phase-no">P3</div>
-        <div class="phase-body"><h4>AI 深堀りチャット + 週次レポート</h4></div>
-        <span class="phase-status st-hold">🅿️ AI保留</span>
-      </div>
-      <div class="phase">
-        <div class="phase-no">P4</div>
-        <div class="phase-body"><h4>テーマ切替 + データ入出力 + 感情コレクション</h4></div>
-        <span class="phase-status st-done">✅ 完了</span>
-      </div>
-      <div class="phase">
-        <div class="phase-no">P5</div>
-        <div class="phase-body"><h4>Year in Review（Spotify Wrapped 風）</h4></div>
-        <span class="phase-status st-done">✅ 完了</span>
-      </div>
+
+      <details class="phase">
+        <summary class="phase-head">
+          <span class="phase-no">P1</span>
+          <span class="phase-body"><h4>日めくりホーム・保存・ゲーミフィケーション基盤</h4></span>
+          <span class="phase-status st-done">✅ 完了</span>
+          <span class="phase-caret"><svg><use href="#i-chevron"/></svg></span>
+        </summary>
+        <div class="phase-items">
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>日めくりカード・気分スタンプ・日記入力・写真添付・保存</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>ストリーク / EXP / レベル / バッジの基盤</span></div>
+        </div>
+      </details>
+
+      <details class="phase">
+        <summary class="phase-head">
+          <span class="phase-no">P2</span>
+          <span class="phase-body"><h4>カレンダー + タイムトラベル + AI感情分析</h4></span>
+          <span class="phase-status st-part">◐ 非AIは完了</span>
+          <span class="phase-caret"><svg><use href="#i-chevron"/></svg></span>
+        </summary>
+        <div class="phase-items">
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>月間カレンダー UI</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>日付セルの気分表示（絵文字スタンプ）</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>過去の日記閲覧 / 先月・去年の同月切替</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>タイムトラベルカード（1週間 / 1ヶ月 / 1年前）</span></div>
+          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>APIキー設定画面</span><span class="pi-note">AI・保留</span></div>
+          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>Claude API 連携</span><span class="pi-note">AI・保留</span></div>
+          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>保存時の感情分析</span><span class="pi-note">AI・保留</span></div>
+          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>過去比較の AI 分析</span><span class="pi-note">AI・保留</span></div>
+        </div>
+      </details>
+
+      <details class="phase">
+        <summary class="phase-head">
+          <span class="phase-no">P3</span>
+          <span class="phase-body"><h4>AI深堀りチャット + 週次レポート</h4></span>
+          <span class="phase-status st-hold">🅿 AI保留</span>
+          <span class="phase-caret"><svg><use href="#i-chevron"/></svg></span>
+        </summary>
+        <div class="phase-items">
+          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>チャット UI（吹き出し形式）</span><span class="pi-note">AI・保留</span></div>
+          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>AIとの対話・会話履歴管理</span><span class="pi-note">AI・保留</span></div>
+          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>過去の日記コンテキスト参照</span><span class="pi-note">AI・保留</span></div>
+          <div class="phase-item"><span class="pi-mark pi-part">◐</span><span>週次レポート（「今週のふりかえり」で非AI版を実装。AI要約は保留）</span></div>
+        </div>
+      </details>
+
+      <details class="phase">
+        <summary class="phase-head">
+          <span class="phase-no">P4</span>
+          <span class="phase-body"><h4>ゲーミフィケーション + テーマ + PWA</h4></span>
+          <span class="phase-status st-done">✅ 完了</span>
+          <span class="phase-caret"><svg><use href="#i-chevron"/></svg></span>
+        </summary>
+        <div class="phase-items">
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>レベルアップ演出 / バッジ解放モーダル</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>感情コレクション図鑑</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>テーマ切替（5テーマ）</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>PWA対応（manifest / Service Worker）</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>データ エクスポート / インポート</span></div>
+        </div>
+      </details>
+
+      <details class="phase">
+        <summary class="phase-head">
+          <span class="phase-no">P5</span>
+          <span class="phase-body"><h4>積み上げサマリー + Year in Review</h4></span>
+          <span class="phase-status st-part">◐ コア完了</span>
+          <span class="phase-caret"><svg><use href="#i-chevron"/></svg></span>
+        </summary>
+        <div class="phase-items">
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>月次積み上げサマリー（目標バー付き）</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>Year in Review スライド</span><span class="pi-note">現状5枚</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>スワイプ遷移（前後＋ドット）</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>SNS共有用 画像生成（PNG保存）</span></div>
+          <div class="phase-item"><span class="pi-mark pi-todo">□</span><span>カウントアップアニメーション</span></div>
+          <div class="phase-item"><span class="pi-mark pi-todo">□</span><span>パララックス / 紙吹雪エフェクト</span></div>
+        </div>
+      </details>
+
     </div>
   </section>
 
