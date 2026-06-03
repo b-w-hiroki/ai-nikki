@@ -488,6 +488,41 @@
     </div>
 
     <div class="settings-section">
+      <div class="settings-label">アカウント / クラウド保存</div>
+      <div class="settings-desc">
+        ログインすると、日記を<strong>クラウドに保存</strong>して別の端末でも続けられます。
+        繋がない場合は今までどおり端末内のみに保存されます。
+      </div>
+
+      <!-- 未接続：接続設定の入力 -->
+      <div id="cloudSetup">
+        <button class="settings-btn settings-btn-sub" id="btnCloudHelp" style="margin-bottom:8px">⚙ クラウド接続を設定（はじめての方）</button>
+        <div id="cloudCfgForm" style="display:none">
+          <input type="text" id="cloudUrl" class="cat-input" style="width:100%;margin-bottom:6px" placeholder="Supabase URL（https://xxxx.supabase.co）">
+          <input type="text" id="cloudKey" class="cat-input" style="width:100%;margin-bottom:8px" placeholder="anon public key">
+          <div class="cloud-help" id="cloudHelpText"></div>
+          <button class="settings-btn" id="btnSaveCloudCfg">接続を保存</button>
+        </div>
+      </div>
+
+      <!-- 接続済み・未ログイン：ログイン -->
+      <div id="cloudLogin" style="display:none">
+        <input type="email" id="cloudEmail" class="cat-input" style="width:100%;margin-bottom:8px" placeholder="メールアドレス">
+        <button class="settings-btn" id="btnEmailLogin" style="margin-bottom:6px">✉️ メールでログイン</button>
+        <button class="settings-btn settings-btn-sub" id="btnGoogleLogin" style="margin-bottom:6px">🟦 Googleでログイン</button>
+        <button class="cloud-link" id="btnCloudReset">接続設定を変更</button>
+      </div>
+
+      <!-- ログイン済み：同期 -->
+      <div id="cloudAccount" style="display:none">
+        <div class="cloud-user" id="cloudUserLabel"></div>
+        <button class="settings-btn" id="btnCloudPush" style="margin-bottom:6px">☁️⬆ クラウドに保存</button>
+        <button class="settings-btn settings-btn-sub" id="btnCloudPull" style="margin-bottom:6px">☁️⬇ クラウドから復元（上書き）</button>
+        <button class="cloud-link" id="btnCloudSignout">ログアウト</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
       <div class="settings-label">データのバックアップ</div>
       <div class="settings-desc">すべての日記・写真・記録を 1 つの JSON ファイルに保存します。</div>
       <button class="settings-btn" id="btnExportData">⬇️ エクスポート（ファイルに保存）</button>

@@ -515,6 +515,12 @@ body {
 }
 .settings-usage { font-size: 11px; color: var(--text-hint); text-align: center; margin-top: 4px; }
 
+/* クラウド／アカウント */
+.cloud-help { font-size: 11px; color: var(--text-secondary); line-height: 1.7; background: var(--bg-warm); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; white-space: pre-wrap; }
+.cloud-help code { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: var(--accent-dark); }
+.cloud-link { display: block; width: 100%; background: none; border: none; color: var(--text-hint); font-size: 12px; cursor: pointer; padding: 8px; font-family: var(--font-body); text-decoration: underline; }
+.cloud-user { font-size: 12.5px; color: var(--text-primary); font-weight: 700; background: var(--accent-light); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; word-break: break-all; }
+
 /* テーマ選択グリッド */
 .theme-grid {
   display: grid;
