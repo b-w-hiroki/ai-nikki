@@ -396,7 +396,7 @@
   <section id="roadmap">
     <div class="sec-head">
       <h2>ロードマップ</h2>
-      <p>各フェーズをタップすると詳細項目が開きます。凡例：✓ 完了 ／ ◐ 一部 ／ 🅿 保留(AI・課金回避) ／ □ 未着手</p>
+      <p>各フェーズをタップすると詳細項目が開きます。凡例：✓ 完了 ／ ◐ 一部 ／ 🤖 内蔵AIで実装(対応ブラウザ) ／ □ 未着手</p>
     </div>
     <div class="timeline">
 
@@ -417,7 +417,7 @@
         <summary class="phase-head">
           <span class="phase-no">P2</span>
           <span class="phase-body"><h4>カレンダー + タイムトラベル + AI感情分析</h4></span>
-          <span class="phase-status st-part">◐ 非AIは完了</span>
+          <span class="phase-status st-done">✅ 完了</span>
           <span class="phase-caret"><svg><use href="#i-chevron"/></svg></span>
         </summary>
         <div class="phase-items">
@@ -425,10 +425,8 @@
           <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>日付セルの気分表示（絵文字スタンプ）</span></div>
           <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>過去の日記閲覧 / 先月・去年の同月切替</span></div>
           <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>タイムトラベルカード（1週間 / 1ヶ月 / 1年前）</span></div>
-          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>APIキー設定画面</span><span class="pi-note">AI・保留</span></div>
-          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>Claude API 連携</span><span class="pi-note">AI・保留</span></div>
-          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>保存時の感情分析</span><span class="pi-note">AI・保留</span></div>
-          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>過去比較の AI 分析</span><span class="pi-note">AI・保留</span></div>
+          <div class="phase-item"><span class="pi-mark pi-part">🤖</span><span>保存時の感情コメント（AIひとこと）</span><span class="pi-note">内蔵AI</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>気分バランス / 感情コレクション（非AIの分析）</span></div>
         </div>
       </details>
 
@@ -436,14 +434,14 @@
         <summary class="phase-head">
           <span class="phase-no">P3</span>
           <span class="phase-body"><h4>AI深堀りチャット + 週次レポート</h4></span>
-          <span class="phase-status st-hold">🅿 AI保留</span>
+          <span class="phase-status st-done">✅ 完了</span>
           <span class="phase-caret"><svg><use href="#i-chevron"/></svg></span>
         </summary>
         <div class="phase-items">
-          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>チャット UI（吹き出し形式）</span><span class="pi-note">AI・保留</span></div>
-          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>AIとの対話・会話履歴管理</span><span class="pi-note">AI・保留</span></div>
-          <div class="phase-item"><span class="pi-mark pi-hold">🅿</span><span>過去の日記コンテキスト参照</span><span class="pi-note">AI・保留</span></div>
-          <div class="phase-item"><span class="pi-mark pi-part">◐</span><span>週次レポート（「今週のふりかえり」で非AI版を実装。AI要約は保留）</span></div>
+          <div class="phase-item"><span class="pi-mark pi-part">🤖</span><span>チャット UI（吹き出し形式）</span><span class="pi-note">内蔵AI</span></div>
+          <div class="phase-item"><span class="pi-mark pi-part">🤖</span><span>AIとの対話（端末内・外部送信なし）</span><span class="pi-note">内蔵AI</span></div>
+          <div class="phase-item"><span class="pi-mark pi-part">🤖</span><span>直近の日記を文脈として参照</span><span class="pi-note">内蔵AI</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>週次レポート（今週のふりかえり）</span></div>
         </div>
       </details>
 
@@ -467,7 +465,7 @@
         <summary class="phase-head">
           <span class="phase-no">P5</span>
           <span class="phase-body"><h4>積み上げサマリー + Year in Review</h4></span>
-          <span class="phase-status st-part">◐ コア完了</span>
+          <span class="phase-status st-done">✅ 完了</span>
           <span class="phase-caret"><svg><use href="#i-chevron"/></svg></span>
         </summary>
         <div class="phase-items">
@@ -475,8 +473,8 @@
           <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>Year in Review スライド</span><span class="pi-note">現状5枚</span></div>
           <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>スワイプ遷移（前後＋ドット）</span></div>
           <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>SNS共有用 画像生成（PNG保存）</span></div>
-          <div class="phase-item"><span class="pi-mark pi-todo">□</span><span>カウントアップアニメーション</span></div>
-          <div class="phase-item"><span class="pi-mark pi-todo">□</span><span>パララックス / 紙吹雪エフェクト</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>カウントアップアニメーション</span></div>
+          <div class="phase-item"><span class="pi-mark pi-done">✓</span><span>パララックス / 紙吹雪エフェクト</span></div>
         </div>
       </details>
 
