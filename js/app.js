@@ -11,6 +11,7 @@ import { DataIO } from './dataio.js';
 import { Insights } from './insights.js';
 import { Extras } from './extras.js';
 import { AI } from './ai.js';
+import { Cloud } from './cloud.js';
 
 // ─── 定数 ───────────────────────────────────────────────
 const DAYS_JP  = ['日', '月', '火', '水', '木', '金', '土'];
@@ -142,6 +143,52 @@ function init() {
     if (e.key === 'Enter') sendChat();
   });
 
+  // クラウド／アカウント
+  document.getElementById('btnCloudHelp')?.addEventListener('click', () => {
+    const f = document.getElementById('cloudCfgForm');
+    if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    const help = document.getElementById('cloudHelpText');
+    if (help) help.textContent =
+      'Supabase（無料）でプロジェクトを作り、Settings→API の URL と anon key を貼り付けます。\n' +
+      '初回は backups テーブルの作成が必要です（手順はドキュメント参照）。';
+  });
+  document.getElementById('btnSaveCloudCfg')?.addEventListener('click', () => {
+    const url = document.getElementById('cloudUrl')?.value;
+    const key = document.getElementById('cloudKey')?.value;
+    if (!url || !key) { showToast('URL と key を入力してください'); return; }
+    Cloud.setConfig(url, key);
+    showToast('✅ 接続を保存しました');
+    renderCloudSection();
+  });
+  document.getElementById('btnCloudReset')?.addEventListener('click', () => {
+    Cloud.clearConfig(); renderCloudSection();
+  });
+  document.getElementById('btnEmailLogin')?.addEventListener('click', async () => {
+    const email = document.getElementById('cloudEmail')?.value;
+    if (!email) { showToast('メールアドレスを入力してください'); return; }
+    const r = await Cloud.signInWithEmail(email);
+    showToast((r.ok ? '✉️ ' : '⚠️ ') + r.message, 4000);
+  });
+  document.getElementById('btnGoogleLogin')?.addEventListener('click', async () => {
+    const r = await Cloud.signInWithGoogle();
+    if (!r.ok) showToast('⚠️ ' + r.message, 4000);
+  });
+  document.getElementById('btnCloudSignout')?.addEventListener('click', async () => {
+    await Cloud.signOut(); showToast('ログアウトしました'); renderCloudSection();
+  });
+  document.getElementById('btnCloudPush')?.addEventListener('click', async () => {
+    showToast('☁️ 保存中…');
+    const r = await Cloud.push();
+    showToast((r.ok ? '✅ ' : '⚠️ ') + r.message, 3500);
+  });
+  document.getElementById('btnCloudPull')?.addEventListener('click', async () => {
+    if (!confirm('クラウドのデータで上書き復元しますか？\nこの端末の現在のデータは置き換わります。')) return;
+    showToast('☁️ 復元中…');
+    const r = await Cloud.pull();
+    if (r.ok) { showToast('✅ ' + r.message); setTimeout(() => location.reload(), 1200); }
+    else showToast('⚠️ ' + r.message, 3500);
+  });
+
   // 設定モーダル
   document.getElementById('btnOpenSettings')?.addEventListener('click', openSettings);
   document.getElementById('btnCloseSettings')?.addEventListener('click', closeSettings);
@@ -181,7 +228,36 @@ function openSettings() {
   if (usage) usage.textContent = `使用容量: 約 ${Storage.getStorageUsageKB()} KB`;
   renderThemeGrid();
   renderCustomCategories();
+  renderCloudSection();
   document.getElementById('settingsModal')?.classList.add('show');
+}
+
+/** クラウド設定セクションの状態を描画（未接続/未ログイン/ログイン済み） */
+async function renderCloudSection() {
+  const setup = document.getElementById('cloudSetup');
+  const login = document.getElementById('cloudLogin');
+  const account = document.getElementById('cloudAccount');
+  if (!setup || !login || !account) return;
+
+  const show = (el, on) => { el.style.display = on ? '' : 'none'; };
+
+  if (!Cloud.isConfigured()) {
+    show(setup, true); show(login, false); show(account, false);
+    const f = document.getElementById('cloudCfgForm');
+    if (f) f.style.display = 'none';
+    return;
+  }
+
+  // 接続済み → ログイン状態を確認
+  show(setup, false);
+  const user = await Cloud.getUser();
+  if (user) {
+    show(login, false); show(account, true);
+    const label = document.getElementById('cloudUserLabel');
+    if (label) label.textContent = '👤 ' + (user.email || user.id);
+  } else {
+    show(login, true); show(account, false);
+  }
 }
 
 function closeSettings() {
