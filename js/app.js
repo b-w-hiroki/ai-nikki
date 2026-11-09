@@ -478,7 +478,7 @@ function triggerSaveAnimation(gained) {
 function showToast(msg, duration = 2500) {
   const toast = document.getElementById('toast');
   if (!toast) return;
-  toast.innerHTML = msg;
+  toast.textContent = msg;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), duration);
 }
@@ -571,7 +571,7 @@ function toggleSearch() {
 }
 
 function escapeHtml(s) {
-  return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 function runSearch(query) {
@@ -593,10 +593,10 @@ function runSearch(query) {
     let snippet = (start > 0 ? '…' : '') + r.text.slice(start, start + 60);
     snippet = escapeHtml(snippet).replace(re, '<mark>$1</mark>');
     const moodInfo = r.mood ? Mood.getMoodInfo(r.mood) : null;
-    return `<div class="search-result" data-date="${r.dateStr}">
+    return `<div class="search-result" data-date="${escapeHtml(r.dateStr)}">
       <div class="search-result-head">
         <span>${moodInfo ? moodInfo.emoji : '📝'}</span>
-        <span class="search-result-date">${Diary.formatDate(r.dateStr)}</span>
+        <span class="search-result-date">${escapeHtml(Diary.formatDate(r.dateStr))}</span>
       </div>
       <div class="search-result-text">${snippet}</div>
     </div>`;
@@ -618,10 +618,10 @@ function renderCustomCategories() {
   }
   list.innerHTML = cats.map((c) => `
     <div class="custom-cat-row">
-      <span class="ccr-icon">${c.icon}</span>
+      <span class="ccr-icon">${escapeHtml(c.icon)}</span>
       <span class="ccr-name">${escapeHtml(c.label)}</span>
       <span class="ccr-unit">${escapeHtml(c.unit)}</span>
-      <button class="ccr-del" data-key="${c.key}" title="削除" aria-label="削除">✕</button>
+      <button class="ccr-del" data-key="${escapeHtml(c.key)}" title="削除" aria-label="削除">✕</button>
     </div>
   `).join('');
   list.querySelectorAll('.ccr-del').forEach((b) => {
@@ -1254,7 +1254,7 @@ function openGoalModal() {
       <label class="goal-label">${cat.label}</label>
       <div class="goal-input-wrap">
         <input class="goal-input" type="number" min="0" data-key="${cat.key}"
-          value="${goals[cat.key] || ''}" placeholder="未設定">
+          value="${escapeHtml(goals[cat.key] || '')}" placeholder="未設定">
         <span class="goal-unit">${cat.unit}</span>
       </div>
     </div>
