@@ -1,0 +1,23 @@
+name: Photo native browser regression
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install isolated test tooling (no audit or lifecycle scripts)
+        run: npm install --prefix "$RUNNER_TEMP/pwa-qa" --no-audit --no-fund --ignore-scripts playwright@1.56.1
+      - name: Install Chromium
+        run: node "$RUNNER_TEMP/pwa-qa/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Test native FileReader, image decode and Canvas
+        env:
+          NODE_PATH: ${{ runner.temp }}/pwa-qa/node_modules
+        run: node qa/photo-browser.cjs
