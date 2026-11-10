@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 const { createServer } = require('node:http');
-const { readFileSync } = require('node:fs');
+const { readFileSync, mkdirSync } = require('node:fs');
 const assert = require('node:assert/strict');
 const source=readFileSync('js/photo.js','utf8');
 // Isolated module fixture: no diaries, credentials, cloud or app-wide initialization.
@@ -8,6 +8,7 @@ const html='<input id="photoInput" type="file"><div id="photoPreview"><img id="p
 const server=createServer((req,res)=>{
  if(req.url==='/')res.writeHead(200,{'Content-Type':'text/html'}).end(html);
  else if(req.url==='/photo.js')res.writeHead(200,{'Content-Type':'application/javascript'}).end(source);
+ else if(/^\/(?:app\.html|manifest\.json|(?:js|css|assets)\/[a-zA-Z0-9_./-]+)$/.test(req.url)&&!req.url.includes('..')){try{const ext=req.url.split('.').pop();res.writeHead(200,{'Content-Type':({html:'text/html',js:'application/javascript',css:'text/css',png:'image/png',json:'application/json'})[ext]||'application/octet-stream'}).end(readFileSync('.'+req.url));}catch{res.writeHead(404).end();}}
  else res.writeHead(404).end();
 });
 (async()=>{
@@ -37,6 +38,26 @@ const server=createServer((req,res)=>{
    const thin=await file('green',1600,1);await Photo.handleFileInput(thin);await document.querySelector('#photoImg').decode();check(document.querySelector('#photoImg').naturalHeight===1,'thin image positive height');
    return {nativeFileReader:true,nativeCanvas:true,nativeDecode:true,brokenPreserves:true,latestWins:true,removeResetSwitch:true,reselection:true,thinImage:true};
   });
-  assert.deepEqual(errors,[]);console.log('PASS',JSON.stringify(result));
+  assert.deepEqual(errors,[]);console.log('PASS module',JSON.stringify(result));
+  const ui=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
+  const origin=`http://127.0.0.1:${server.address().port}`;
+  await ui.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
+  const app=await ui.newPage();const uiErrors=[];app.on('pageerror',e=>uiErrors.push(e.message));
+  await app.goto(origin+'/app.html');await app.locator('#onboardSkip').click();
+  const png=await page.evaluate(async()=>{const c=document.createElement('canvas');c.width=1600;c.height=1200;c.getContext('2d').fillStyle='orange';c.getContext('2d').fillRect(0,0,1600,1200);return c.toDataURL('image/png').split(',')[1];});
+  const payload={name:'synthetic.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')};
+  await app.locator('#photoInput').setInputFiles(payload);
+  await app.waitForFunction(()=>document.querySelector('#photoImg').naturalWidth===800);
+  const saved=await app.locator('#photoImg').getAttribute('src');
+  await app.locator('#photoInput').setInputFiles({name:'broken.png',mimeType:'image/png',buffer:Buffer.from('invalid')});
+  await app.getByText(/この写真は開けませんでした/).waitFor();
+  assert.equal(await app.locator('#photoImg').getAttribute('src'),saved);
+  await app.locator('#photoRemove').click();assert.equal(await app.locator('#photoPreview').isVisible(),false);
+  await app.locator('#photoInput').setInputFiles(payload);await app.locator('#photoPreview').waitFor({state:'visible'});
+  assert.equal(await app.locator('#photoInput').inputValue(),'');
+  mkdirSync('qa-artifacts',{recursive:true});
+  for(const width of [390,1280]){await app.setViewportSize({width,height:844});await app.screenshot({path:`qa-artifacts/photo-${width}.png`,fullPage:true});}
+  assert.deepEqual(uiErrors,[]);console.log('PASS app.html file input, broken-image toast/preservation, remove/reselect, 390/1280 screenshots; SW and external CDNs blocked');
+  await ui.close();
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
