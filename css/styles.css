@@ -485,7 +485,7 @@ body {
 .goal-unit { font-size: 11px; color: var(--text-hint); }
 
 /* ─── 設定モーダル ─────────────────────────── */
-.settings-modal-content { max-width: 360px; width: 90%; text-align: left; }
+.settings-modal-content { max-width: 360px; width: 90%; text-align: left; max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; }
 .settings-section {
   margin-bottom: 18px;
   padding-bottom: 18px;
