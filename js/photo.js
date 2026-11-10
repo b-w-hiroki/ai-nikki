@@ -7,6 +7,7 @@ const QUALITY = 0.7;
 
 let _currentBase64 = null;
 let _isNew = false;
+let _isRemoved = false;
 let _selectionId = 0;
 
 const Photo = {
@@ -16,6 +17,8 @@ const Photo = {
   isNew() {
     return _isNew;
   },
+
+  isRemoved() { return _isRemoved; },
 
   /** input[type=file] の change から呼ぶ */
   handleFileInput(file) {
@@ -40,6 +43,7 @@ const Photo = {
             const base64 = this._compress(img);
             _currentBase64 = base64;
             _isNew = true;
+            _isRemoved = false;
             this._showPreview(base64);
             resolve(base64);
           } catch {
@@ -61,6 +65,7 @@ const Photo = {
     _selectionId += 1;
     _currentBase64 = base64 || null;
     _isNew = false;
+    _isRemoved = false;
     if (base64) {
       this._showPreview(base64);
     } else {
@@ -72,6 +77,7 @@ const Photo = {
     _selectionId += 1;
     _currentBase64 = null;
     _isNew = false;
+    _isRemoved = true;
     this._hidePreview();
     const input = document.getElementById('photoInput');
     if (input) input.value = '';
@@ -81,6 +87,7 @@ const Photo = {
     _selectionId += 1;
     _currentBase64 = null;
     _isNew = false;
+    _isRemoved = false;
     this._hidePreview();
     const input = document.getElementById('photoInput');
     if (input) input.value = '';

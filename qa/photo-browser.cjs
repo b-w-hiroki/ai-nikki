@@ -68,7 +68,10 @@ const server=createServer((req,res)=>{
   assert.equal(await app.locator('#photoImg').getAttribute('src'),saved);
   mkdirSync('qa-artifacts',{recursive:true});
   for(const width of [390,1280]){await app.setViewportSize({width,height:844});await app.locator('#photoPreview').scrollIntoViewIfNeeded();await app.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));assert.equal(await app.evaluate(()=>document.querySelector('#photoPreview').getBoundingClientRect().bottom<=document.querySelector('.bottom-nav').getBoundingClientRect().top),true);assert.equal(await app.evaluate(()=>document.querySelector('#saveBtn').getBoundingClientRect().bottom<=document.querySelector('.bottom-nav').getBoundingClientRect().top),true);await app.screenshot({path:`qa-artifacts/photo-${width}.png`});}
-  assert.deepEqual(uiErrors,[]);console.log('PASS app.html file input, broken-image toast/preservation, remove/reselect, saved diary/photo reload, calendar roundtrip, preview/save above navigation, 390/1280 viewport screenshots; SW and external CDNs blocked');
+  await app.locator('#photoRemove').click();await app.locator('#saveBtn').click();await app.reload();
+  assert.equal(await app.locator('#photoPreview').isVisible(),false);
+  assert.equal(await app.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('ai-nikki-photos')||'{}')).length),0);
+  assert.deepEqual(uiErrors,[]);console.log('PASS app.html file input, broken-image toast/preservation, remove/reselect, saved diary/photo reload, calendar roundtrip, explicit remove-save-reload does not resurrect photo, preview/save above navigation, 390/1280 viewport screenshots; SW and external CDNs blocked');
   await ui.close();
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

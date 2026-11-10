@@ -421,6 +421,9 @@ async function saveDiary() {
   // 写真保存
   if (Photo.isNew() && Photo.getCurrentBase64()) {
     Storage.setPhoto(dateStr, Photo.getCurrentBase64());
+  } else if (Photo.isRemoved()) {
+    // Only an explicit remove action may delete a saved attachment.
+    Storage.removePhoto(dateStr);
   }
 
   // ゲーミフィケーション

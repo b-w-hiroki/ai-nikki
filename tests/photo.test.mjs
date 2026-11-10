@@ -137,3 +137,24 @@ test('file input reports failures and clears the picker for retry', async () => 
   assert.equal(calls[0], file);
   assert.equal(messages[0][0], '⚠️ 読み込み失敗');
 });
+
+
+test('only explicit removal marks a saved photo for deletion', async () => {
+  const h = setup(); h.photo.loadExisting('data:image/jpeg;base64,saved');
+  assert.equal(h.photo.isRemoved(), false);
+  const pending = h.photo.handleFileInput({});
+  assert.equal(h.photo.isRemoved(), false);
+  h.load(); h.images[0].onerror(); await assert.rejects(pending);
+  assert.equal(h.photo.isRemoved(), false);
+  h.photo.remove(); assert.equal(h.photo.isRemoved(), true);
+  h.photo.reset(); assert.equal(h.photo.isRemoved(), false);
+  h.photo.remove(); h.photo.loadExisting('data:image/jpeg;base64,other');
+  assert.equal(h.photo.isRemoved(), false);
+  h.photo.remove(); const next=h.photo.handleFileInput({});h.load();h.images[1].onload();await next;
+  assert.equal(h.photo.isRemoved(), false);
+});
+
+test('save routes deletion only through the explicit removal flag', () => {
+  const app = readFileSync('js/app.js', 'utf8');
+  assert.match(app, /else if \(Photo\.isRemoved\(\)\)\s*\{[\s\S]*?Storage\.removePhoto\(dateStr\)/);
+});
