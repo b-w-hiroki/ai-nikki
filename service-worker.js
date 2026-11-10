@@ -2,7 +2,7 @@
  * service-worker.js — オフライン対応 PWA
  */
 
-const CACHE_NAME = 'ai-nikki-v2';
+const CACHE_NAME = 'ai-nikki-v3';
 const ASSETS = [
   './app.html',
   './css/styles.css',
