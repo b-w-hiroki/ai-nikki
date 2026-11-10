@@ -10,12 +10,12 @@ test('updating photos only retires this app caches, preserving sister apps', asy
     clients: { claim() {} }, skipWaiting() {},
   };
   const caches = {
-    keys: async () => ['ai-nikki-v1', 'ai-nikki-v2', 'osanpo-bingo-v163', 'unrelated'],
+    keys: async () => ['ai-nikki-v1', 'ai-nikki-v2', 'ai-nikki-v3', 'osanpo-bingo-v163', 'unrelated'],
     delete: async key => { deleted.push(key); return true; },
   };
   runInNewContext(readFileSync('service-worker.js', 'utf8'), { self, caches });
   let work;
   handlers.activate({ waitUntil: promise => { work = promise; } });
   await work;
-  assert.deepEqual(deleted, ['ai-nikki-v1']);
+  assert.deepEqual(deleted, ['ai-nikki-v1', 'ai-nikki-v2']);
 });

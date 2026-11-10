@@ -156,8 +156,8 @@ function init() {
     if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
     const help = document.getElementById('cloudHelpText');
     if (help) help.textContent =
-      'Supabase（無料）でプロジェクトを作り、Settings→API の URL と anon key を貼り付けます。\n' +
-      '初回は backups テーブルの作成が必要です（手順はドキュメント参照）。';
+      '自分のSupabaseプロジェクトの URL と anon public key を入力します。秘密鍵・service_role は使用しないでください。\n' +
+      '接続後は認証の通信が発生します。backups テーブルと本人限定RLSが必要です（README参照）。';
   });
   document.getElementById('btnSaveCloudCfg')?.addEventListener('click', () => {
     const url = document.getElementById('cloudUrl')?.value;
