@@ -485,7 +485,7 @@ body {
 .goal-unit { font-size: 11px; color: var(--text-hint); }
 
 /* ─── 設定モーダル ─────────────────────────── */
-.settings-modal-content { max-width: 360px; width: 90%; text-align: left; max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; }
+#settingsModal .settings-modal-content { max-width: 360px; width: 90%; text-align: left; max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; }
 .settings-section {
   margin-bottom: 18px;
   padding-bottom: 18px;
@@ -524,7 +524,7 @@ body {
 /* テーマ選択グリッド */
 .theme-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
 }
 .theme-swatch {
@@ -547,7 +547,7 @@ body {
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
-.theme-name { font-size: 10px; color: var(--text-secondary); white-space: nowrap; }
+.theme-name { font-size: 10px; color: var(--text-secondary); white-space: normal; overflow-wrap: anywhere; text-align: center; }
 .theme-swatch.active .theme-name { color: var(--accent-dark); font-weight: 700; }
 
 /* ─── 保存ボタン ─────────────────────────────────────── */
@@ -909,7 +909,7 @@ body {
 /* ─── 感情コレクション図鑑 ───────────────────────────── */
 .mood-collection {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 14px;
 }
