@@ -264,7 +264,7 @@
 
 
   <!-- ══════════════════════════════════════════
-       Screen 3: AI チャット（Phase 3 で実装）
+       Screen 3: AI チャット（内蔵AI対応環境のみ）
   ══════════════════════════════════════════ -->
   <div id="screen-chat" class="screen">
     <header class="header">
@@ -282,8 +282,8 @@
       <div class="coming-soon-text">
         AIチャットは、お使いの端末・ブラウザに内蔵された
         AI（追加料金なし）で動きます。<br><br>
-        対応ブラウザ（最新の Chrome など）で開くと、
-        書いた日記について AI とやさしく対話できます。<br><br>
+        利用可否はブラウザ・OS・端末性能・モデル提供状況によります。
+        最新Chromeでも利用できるとは限りません。<br><br>
         いまは <strong>「日記」タブ</strong> で記録を続けましょう。
       </div>
       <button class="coming-soon-btn" onclick="showScreen('home')">日記を書く</button>
@@ -292,7 +292,7 @@
     <!-- 内蔵AI 対応時のチャットUI -->
     <div class="chat-wrap" id="chatWrap" style="display:none">
       <div class="chat-note" id="chatNote">
-        💡 会話は端末内のAIで処理され、外部に送信されません。
+        💡 内蔵AIが会話と直近3件の日記（本文各80文字・日付・気分）を処理します。外部AI APIへの送信はありません。初回はモデルのダウンロードが必要な場合があります。
       </div>
       <div class="chat-log" id="chatLog"></div>
       <div class="chat-input-row">
@@ -490,8 +490,8 @@
     <div class="settings-section">
       <div class="settings-label">アカウント / クラウド保存</div>
       <div class="settings-desc">
-        ログインすると、日記を<strong>クラウドに保存</strong>して別の端末でも続けられます。
-        繋がない場合は今までどおり端末内のみに保存されます。
+        通常はこの端末・ブラウザ内に保存します。クラウドは任意・手動で、自動同期しません。
+        「クラウドに保存」で日記・写真・設定などのバックアップを接続先Supabaseへ送ります。復元前にはJSONを書き出してください。
       </div>
 
       <!-- 未接続：接続設定の入力 -->
@@ -499,7 +499,7 @@
         <button class="settings-btn settings-btn-sub" id="btnCloudHelp" style="margin-bottom:8px">⚙ クラウド接続を設定（はじめての方）</button>
         <div id="cloudCfgForm" style="display:none">
           <input type="text" id="cloudUrl" class="cat-input" style="width:100%;margin-bottom:6px" placeholder="Supabase URL（https://xxxx.supabase.co）">
-          <input type="text" id="cloudKey" class="cat-input" style="width:100%;margin-bottom:8px" placeholder="anon public key">
+          <input type="text" id="cloudKey" class="cat-input" style="width:100%;margin-bottom:8px" placeholder="anon public key（秘密鍵は不可）">
           <div class="cloud-help" id="cloudHelpText"></div>
           <button class="settings-btn" id="btnSaveCloudCfg">接続を保存</button>
         </div>

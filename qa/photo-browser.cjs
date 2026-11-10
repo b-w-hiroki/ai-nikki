@@ -72,6 +72,23 @@ const server=createServer((req,res)=>{
   assert.equal(await app.locator('#photoPreview').isVisible(),false);
   assert.equal(await app.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('ai-nikki-photos')||'{}')).length),0);
   assert.deepEqual(uiErrors,[]);console.log('PASS app.html file input, broken-image toast/preservation, remove/reselect, saved diary/photo reload, calendar roundtrip, explicit remove-save-reload does not resurrect photo, preview/save above navigation, 390/1280 viewport screenshots; SW and external CDNs blocked');
+  for (const width of [320,390]) {
+   await app.setViewportSize({width,height:844});
+   await app.locator('#nav-profile').click();await app.locator('#btnOpenSettings').click();
+   assert.match(await app.locator('#settingsModal').innerText(),/自動同期しません/);
+   await app.locator('#btnCloudHelp').click();
+   assert.match(await app.locator('#cloudHelpText').innerText(),/本人限定RLS/);
+   await app.locator('#cloudSetup').scrollIntoViewIfNeeded();
+   await app.screenshot({path:`qa-artifacts/privacy-settings-${width}.png`});
+   await app.locator('#btnCloseSettings').click();
+   await app.locator('#nav-chat').click();
+   await app.locator('#chatUnsupported').waitFor({state:'visible'});
+   assert.match(await app.locator('#chatUnsupported').innerText(),/最新Chromeでも利用できるとは限りません/);
+   assert.equal(await app.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   await app.screenshot({path:`qa-artifacts/privacy-ai-${width}.png`});
+   await app.locator('#nav-home').click();
+  }
+  console.log('PASS privacy UI 320/390: local/manual-cloud notice, RLS help, unsupported AI fallback, close/reopen and return home; no real cloud/AI');
   await ui.close();
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
