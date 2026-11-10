@@ -63,7 +63,14 @@ function init() {
 
   // 写真 input
   document.getElementById('photoInput')?.addEventListener('change', async (e) => {
-    await Photo.handleFileInput(e.target.files[0]);
+    const file = e.target.files?.[0];
+    // Allow selecting the same file again after a failed read.
+    e.target.value = '';
+    try {
+      await Photo.handleFileInput(file);
+    } catch (error) {
+      showToast('⚠️ ' + error.message, 4000);
+    }
   });
 
   // 気分ボタン
@@ -414,6 +421,9 @@ async function saveDiary() {
   // 写真保存
   if (Photo.isNew() && Photo.getCurrentBase64()) {
     Storage.setPhoto(dateStr, Photo.getCurrentBase64());
+  } else if (Photo.isRemoved()) {
+    // Only an explicit remove action may delete a saved attachment.
+    Storage.removePhoto(dateStr);
   }
 
   // ゲーミフィケーション

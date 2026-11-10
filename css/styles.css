@@ -46,7 +46,7 @@
   --font-handwrite: 'Klee One', cursive;
 }
 
-html { font-size: 16px; }
+html { font-size: 16px; scroll-padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 
 body {
   font-family: var(--font-body);
@@ -57,7 +57,7 @@ body {
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
-  padding-bottom: 100px;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ─── レイアウト ─────────────────────────────────────── */
@@ -614,6 +614,7 @@ body {
 
 /* ─── ボトムナビ ─────────────────────────────────────── */
 .bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   position: fixed;
   bottom: 0;
   left: 0;

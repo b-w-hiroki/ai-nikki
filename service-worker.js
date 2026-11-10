@@ -2,7 +2,7 @@
  * service-worker.js — オフライン対応 PWA
  */
 
-const CACHE_NAME = 'ai-nikki-v1';
+const CACHE_NAME = 'ai-nikki-v2';
 const ASSETS = [
   './app.html',
   './css/styles.css',
@@ -27,7 +27,7 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k.startsWith('ai-nikki-') && k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
   self.clients.claim();
