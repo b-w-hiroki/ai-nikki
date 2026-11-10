@@ -55,9 +55,20 @@ const server=createServer((req,res)=>{
   await app.locator('#photoRemove').click();assert.equal(await app.locator('#photoPreview').isVisible(),false);
   await app.locator('#photoInput').setInputFiles(payload);await app.locator('#photoPreview').waitFor({state:'visible'});
   assert.equal(await app.locator('#photoInput').inputValue(),'');
+  await app.locator('#diaryText').fill('Synthetic browser QA diary');
+  await app.locator('#saveBtn').click();
+  await app.reload();
+  assert.equal(await app.locator('#diaryText').inputValue(),'Synthetic browser QA diary');
+  await app.waitForFunction(()=>document.querySelector('#photoImg').naturalWidth===800);
+  assert.equal(await app.locator('#photoImg').getAttribute('src'),saved);
+  await app.locator('#nav-calendar').click();await app.locator('.day-cell.today.has-entry').click();
+  await app.getByText(/📖.*Synthetic browser QA diary/).waitFor();
+  await app.locator('#nav-home').click();
+  assert.equal(await app.locator('#diaryText').inputValue(),'Synthetic browser QA diary');
+  assert.equal(await app.locator('#photoImg').getAttribute('src'),saved);
   mkdirSync('qa-artifacts',{recursive:true});
-  for(const width of [390,1280]){await app.setViewportSize({width,height:844});await app.screenshot({path:`qa-artifacts/photo-${width}.png`,fullPage:true});}
-  assert.deepEqual(uiErrors,[]);console.log('PASS app.html file input, broken-image toast/preservation, remove/reselect, 390/1280 screenshots; SW and external CDNs blocked');
+  for(const width of [390,1280]){await app.setViewportSize({width,height:844});await app.locator('#photoPreview').scrollIntoViewIfNeeded();await app.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));assert.equal(await app.evaluate(()=>document.querySelector('#photoPreview').getBoundingClientRect().bottom<=document.querySelector('.bottom-nav').getBoundingClientRect().top),true);assert.equal(await app.evaluate(()=>document.querySelector('#saveBtn').getBoundingClientRect().bottom<=document.querySelector('.bottom-nav').getBoundingClientRect().top),true);await app.screenshot({path:`qa-artifacts/photo-${width}.png`});}
+  assert.deepEqual(uiErrors,[]);console.log('PASS app.html file input, broken-image toast/preservation, remove/reselect, saved diary/photo reload, calendar roundtrip, preview/save above navigation, 390/1280 viewport screenshots; SW and external CDNs blocked');
   await ui.close();
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
